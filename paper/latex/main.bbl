@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{25}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -88,12 +88,28 @@ Marc Lanctot, Edward Lockhart, Jean-Baptiste Lespiau, Vinicius Zambaldi, et~al.
 \newblock {OpenSpiel}: A framework for reinforcement learning in games.
 \newblock \emph{arXiv preprint arXiv:1908.09453}, 2019.
 
+\bibitem[Liang et~al.(2024)Liang, Sun, Zheng, Liu, Eysenbach, Sandholm, Huang,
+  and McAleer]{liang2024grad}
+Yongyuan Liang, Yanchao Sun, Ruijie Zheng, Xiangyu Liu, Benjamin Eysenbach,
+  Tuomas Sandholm, Furong Huang, and Stephen McAleer.
+\newblock Game-theoretic robust reinforcement learning handles
+  temporally-coupled perturbations.
+\newblock In \emph{International Conference on Learning Representations}, 2024.
+
 \bibitem[Lin et~al.(2020)Lin, Dzeparoska, Zhang, Leon-Garcia, and
   Papernot]{lin2020marlrobust}
 Jieyu Lin, Kristina Dzeparoska, Sai~Qian Zhang, Alberto Leon-Garcia, and
   Nicolas Papernot.
 \newblock On the robustness of cooperative multi-agent reinforcement learning.
 \newblock In \emph{IEEE Security and Privacy Workshops}, pages 62--68, 2020.
+
+\bibitem[Mguni et~al.(2025)Mguni, Sun, Chen, Yang, Darabi, Orimoloye, and
+  Yang]{mguni2025marta}
+David Mguni, Yaqi Sun, Haojun Chen, Wanrong Yang, Amir Darabi, Larry~Olanrewaju
+  Orimoloye, and Yaodong Yang.
+\newblock Learning robust multi-agent policies via selective adversarial fault
+  induction.
+\newblock \emph{arXiv preprint arXiv:2508.08800}, 2025.
 
 \bibitem[Nilim and El~Ghaoui(2005)]{nilim2005robust}
 Arnab Nilim and Laurent El~Ghaoui.

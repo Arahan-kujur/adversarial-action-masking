@@ -34,6 +34,8 @@ the official NeurIPS checklist.
   public-information adversary, CACv-greedy oracle, exact L0 diagnostics,
   separate-network DQN, and action-dropout defense.
 - Strict matched-L0 control is in `experiments/matched_l0_control.py`.
+- Evaluation-only and mask-aware victim controls are in
+  `experiments/mask_timing_controls.py`.
 
 ## Compute
 

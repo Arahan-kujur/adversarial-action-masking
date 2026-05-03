@@ -50,6 +50,9 @@ Adversarial attacks on RL most commonly perturb observations~\citep{huang2017adv
 \paragraph{Robust and action-robust RL.}
 Robust MDPs~\citep{iyengar2005robust,nilim2005robust} and constrained MDPs~\citep{altman1999constrained} model uncertainty or constraints in the environment. Robust Adversarial RL (RARL)~\citep{pinto2017robust} and action-robust RL~\citep{tessler2019action} train against perturbations of the action actually executed. Those channels modify selected actions; our adversary removes actions from the legal set before selection. This difference matters: bounded perturbations preserve the agent's ability to choose, whereas removal can collapse a decision point to a singleton action set.
 
+\paragraph{Robust MARL defenses.}
+Recent robust MARL methods train agents against structured adversaries, including game-theoretic robust training for temporally coupled perturbations (GRAD)~\citep{liang2024grad} and fault-switching MARL defenses such as MARTA~\citep{mguni2025marta}. These approaches are complementary: they improve robustness to perturbations, malfunctions, or adversarial agents within an intact joint action space. Our attack changes the feasible action set itself. A mask-aware version of such defenses is a natural direction, but existing guarantees do not directly cover state-dependent removal of legal actions.
+
 \paragraph{Action sets and masking.}
 Invalid action masking prevents agents from selecting impossible moves~\citep{huang2022closer}. Decision-theoretic planning has long studied structural leverage and action contingencies~\citep{boutilier1999decision}, but typically not adversarially selected action availability during learning. Our work reverses the usual masking motivation: the mask is not a safety or efficiency aid, but an attacker-chosen capability removal.
 
@@ -331,7 +334,7 @@ Both adversaries use identical training (REINFORCE, same budget, same iterations
 
 % -------------------------------------------------------------------
 \subsection{Additional Ablations}
-The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Random action-dropout training provides only modest defense ($-2.05$ vs.\ $-2.30$ under attack). Full ablation tables are in Appendix~\ref{app:ablations}.
+The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Evaluation-only masking already degrades a normally trained Leduc victim ($-0.58$), while continued and mask-aware training converge to larger losses ($-2.65$ and $-2.71$), showing both immediate structural harm and long-run adaptation failure. Random action-dropout training provides only modest defense ($-2.05$ vs.\ $-2.30$ under attack). Full ablation tables are in Appendix~\ref{app:ablations}.
 
 % ===================================================================
 \section{Discussion}
@@ -502,6 +505,21 @@ Normalisation aids cross-game comparison but obscures absolute exploitability: a
 
 \section{Additional Ablations}
 \label{app:ablations}
+
+\begin{table}[ht]
+\centering
+\caption{Mask timing controls in Leduc Q-learning.}
+\begin{tabular}{lc}
+\toprule
+Training/evaluation protocol & Victim reward \\
+\midrule
+No mask & $+0.05 \pm 0.03$ \\
+Evaluation-only mask & $-0.58 \pm 0.18$ \\
+Continued training under mask & $-2.65 \pm 0.30$ \\
+Mask-aware training from scratch & $-2.71 \pm 0.26$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[ht]
 \centering
