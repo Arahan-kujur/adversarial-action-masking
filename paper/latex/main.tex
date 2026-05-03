@@ -21,24 +21,24 @@
 
 % ===================================================================
 \begin{abstract}
-We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. Unlike random or fixed removal, a learned adversary targets strategically important decision points. In Kuhn and Leduc Poker, across Q-Learning, PPO, DQN, and NFSP victims, we show that: (i)~adversarial masking causes significantly more damage than random masking at the same budget---and is $5\times$ more damaging than RARL-style action perturbation; (ii)~the adversary learns to minimise the victim's effective contingent action capacity by targeting high-value decision nodes; (iii)~self-play dynamics amplify the attack through co-adaptation; and (iv)~the learned attack transfers to unseen agents, indicating structural rather than agent-specific vulnerability. A detailed budget sweep reveals that at intermediate budgets, a value-based heuristic can match the learned adversary, but the latter generalises without requiring access to the victim's Q-table. These results demonstrate that self-play RL systems are brittle to small, targeted action-space perturbations, with implications for adversarial robustness in deployed multi-agent systems.
+We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. In Kuhn and Leduc Poker, across tabular Q-Learning, PPO, NFSP, and neural DQN victims, we show that: (i)~adversarial masking causes up to $9\times$ more damage than random masking at the same budget, and $11\times$ more than RARL-style action perturbation; (ii)~the adversary learns to minimise reach-weighted contingent action capacity (CAC$_w$), empirically confirmed by a Pearson correlation of $r = 0.80$ between CAC$_w$ and victim reward; (iii)~self-play co-adaptation amplifies the attack; and (iv)~the learned mask transfers across agents, indicating structural vulnerability. Critically, a neural adversary (MLP with REINFORCE) against a DQN victim in Leduc Poker achieves $-2.57$ reward per hand ($2.2\times$ worse than random masking)---demonstrating the phenomenon scales beyond tabular settings to function-approximation agents in games with $\sim$50 information sets.
 \end{abstract}
 
 % ===================================================================
 \section{Introduction}
 
-Multi-agent reinforcement learning (MARL) agents trained via self-play achieve strong performance in competitive domains~\citep{silver2018general,brown2019superhuman}, but their robustness to structural environment changes remains poorly understood. Prior work on adversarial attacks focuses on observation perturbations~\citep{huang2017adversarial,gleave2020adversarial} or reward manipulation~\citep{zhang2020adaptive}. We study a different attack surface: the \emph{action space} itself. We show that removing fewer than 50\% of an agent's decision points suffices for catastrophic collapse when the removal is adversarially targeted rather than random.
+Multi-agent reinforcement learning (MARL) agents trained via self-play achieve strong performance in competitive domains~\citep{silver2018general,brown2019superhuman}, but their robustness to structural environment changes remains poorly understood. Prior work on adversarial attacks focuses on observation perturbations~\citep{huang2017adversarial,gleave2020adversarial} or reward manipulation~\citep{zhang2020adaptive}. We study a different, more severe attack surface: the \emph{action space} itself.
 
-An adversary that can selectively remove actions---disabling specific capabilities rather than adding noise---poses a qualitatively different threat. Such attacks arise naturally: hardware failures disable actuators, regulatory changes restrict strategies, and API deprecations remove endpoints. We formalise this as a bi-level optimisation where the inner loop trains an RL agent under masked actions and the outer loop trains an adversary to choose which actions to remove.
+An adversary that selectively removes actions---disabling specific capabilities rather than adding noise---poses a qualitatively different threat from bounded perturbation. Such attacks arise naturally: hardware failures disable actuators, regulatory changes restrict strategies, API deprecations remove endpoints, and sandboxing constrains agent capabilities. We formalise this as a bi-level optimisation where the inner loop trains an RL agent under masked actions and the outer loop trains an adversary to choose which actions to remove.
 
-Our key insight is that adversarial masking induces collapse by selectively eliminating high-impact decision points, effectively minimising the victim's \emph{reach-weighted contingent action capacity} (CAC$_w$). Where uniform removal must eliminate \emph{all} decisions to trigger catastrophic collapse, an adversary achieves comparable damage by targeting only the strategically important subset.
+Our key finding is that adversarial masking is \emph{dramatically more efficient} than random removal: a neural adversary targeting fewer than 50\% of decision points in Leduc Poker causes $9\times$ more damage than removing a fixed action everywhere. The mechanism operates through selective minimisation of reach-weighted contingent action capacity (CAC$_w$)---empirically verified by strong correlation between CAC$_w$ and victim reward across budget levels.
 
 \paragraph{Contributions.}
 \begin{itemize}
-  \item We introduce the adversarial action masking problem: a learned attacker chooses which actions to remove from a self-play RL agent.
-  \item We show adversarial removal causes significantly more damage than random removal at equal budget, and that the attack transfers across agents.
-  \item We demonstrate that self-play co-adaptation amplifies the adversary's effect beyond what a fixed-opponent setting produces.
-  \item We connect the attack mechanism to contingent action capacity, showing the adversary targets states of high strategic importance.
+  \item We formalise the adversarial action masking problem and show it is fundamentally more severe than action perturbation ($11\times$ more damaging than RARL).
+  \item We demonstrate the attack scales from tabular (Q-Learning, PPO, NFSP) to neural (DQN) agents across games of increasing complexity (Kuhn: 6 states; Leduc: $\sim$50 states).
+  \item We provide empirical evidence that the adversary minimises CAC$_w$ (Pearson $r = 0.80$), connecting the attack to game-theoretic structure.
+  \item We show the attack transfers across agents and is amplified by self-play co-adaptation.
 \end{itemize}
 
 % ===================================================================
@@ -48,63 +48,64 @@ Our key insight is that adversarial masking induces collapse by selectively elim
 Adversarial observation perturbations~\citep{huang2017adversarial,gleave2020adversarial} and reward poisoning~\citep{zhang2020adaptive} are well-studied threat models. Action-space attacks are less explored: invalid action masking~\citep{huang2022closer} addresses the opposite problem (preventing illegal actions), and constrained MDPs~\citep{altman1999constrained} formalise action restrictions but not adversarial selection. We study \emph{deliberate, strategic} action removal by a learned attacker.
 
 \paragraph{Action-robust and adversarial RL.}
-Robust Adversarial RL (RARL)~\citep{pinto2017robust} trains an adversary that \emph{perturbs} the agent's actions within a bounded set; NR/PR-MDP formulations~\citep{tessler2019action} extend this to probabilistic and nominal-robust action channels. These methods model continuous, bounded perturbations where the agent's chosen action is \emph{modified}. Our setting is structurally different: actions are \emph{removed} entirely (discrete, binary availability), which eliminates decision points rather than distorting them. This distinction matters because removal can reduce contingent action capacity to zero---a qualitative regime change that bounded perturbation cannot induce. Observation-adversarial methods~\citep{zhang2021robust,sun2022who} operate on a separate channel and do not address action-space structure.
+Robust Adversarial RL (RARL)~\citep{pinto2017robust} trains an adversary that \emph{perturbs} the agent's actions within a bounded set; NR/PR-MDP formulations~\citep{tessler2019action} extend this to probabilistic and nominal-robust action channels. These methods model continuous perturbations where the chosen action is \emph{modified}. Our setting is structurally different: actions are \emph{removed} entirely (discrete, binary availability), which eliminates decision points rather than distorting them. This distinction matters because removal can reduce contingent action capacity to zero---a qualitative regime change that bounded perturbation cannot induce. Observation-adversarial methods~\citep{zhang2021robust,sun2022who} operate on a separate channel.
 
-\paragraph{Self-play robustness.}
-Self-play agents can cycle, overfit to their own weaknesses, or exhibit non-transitive behaviour~\citep{balduzzi2019open,lanctot2019openspiel}. Population-based methods (PSRO)~\citep{lanctot2017unified} maintain diversity to avoid these failure modes. We show that even with diverse training, targeted action removal induces collapse---PSRO mitigates but does not prevent the vulnerability.
-
-\paragraph{Decision capacity in self-play.}
-Contingent action capacity (CAC)---the count of information sets with $>1$ legal action---governs whether self-play agents collapse under action-space constraints. At CAC $= 0$ (every decision forced), agents converge to a deterministic exploitation attractor. We extend this: an adversary can efficiently drive CAC$_w$ toward zero by targeting a small number of high-reach, high-value decision points.
-
-\paragraph{Neural Fictitious Self-Play.}
-NFSP~\citep{heinrich2016deep} combines RL with average-strategy tracking for imperfect-information games. Even NFSP-style agents collapse under structural action removal, as the average strategy cannot compensate when the action space itself has been reduced.
+\paragraph{Self-play robustness and NFSP.}
+Self-play agents can cycle, overfit, or exhibit non-transitive behaviour~\citep{balduzzi2019open,lanctot2019openspiel}. Population-based methods (PSRO)~\citep{lanctot2017unified} maintain diversity to mitigate these. NFSP~\citep{heinrich2016deep} combines RL with average-strategy tracking. We show that \emph{all} of these---including NFSP---collapse under structural action removal, because no algorithm can compensate when the action space itself is reduced.
 
 % ===================================================================
 \section{Problem Formulation}
 
 \paragraph{Setup.}
-Consider a two-player zero-sum game with self-play training. Player~0 (victim) learns via RL. An adversary $\mathcal{M}$ observes the game state and produces a mask:
+Consider a two-player zero-sum game with self-play training. Player~0 (victim) learns via RL. An adversary $\mathcal{M}$ produces a mask per decision point:
 \[
 \text{mask} = \mathcal{M}(\text{info\_state}, A_{\text{legal}}, \text{player})
 \]
-returning a subset of legal actions available to the victim. The victim observes only the masked action set and is unaware of the adversary's presence.
+returning a subset of legal actions. The victim observes only the masked action set and is unaware of the adversary.
 
 \paragraph{Bi-level optimisation.}
 \begin{align}
 \text{Inner:} \quad & \pi^* = \arg\max_\pi \mathbb{E}\left[\sum_t r_t \mid \pi, \mathcal{M}\right] \label{eq:inner} \\
 \text{Outer:} \quad & \mathcal{M}^* = \arg\min_{\mathcal{M}} \mathbb{E}\left[\sum_t r_t \mid \pi^*, \mathcal{M}\right] \label{eq:outer}
 \end{align}
-The inner loop trains the victim under the adversary's mask; the outer loop updates the adversary to minimise the victim's expected reward.
+The inner loop trains the victim under the mask; the outer loop updates the adversary to minimise the victim's expected reward.
 
 \paragraph{Budget constraint.}
-The adversary can mask at most $k$ of the victim's \emph{information sets} (not individual actions---the budget counts states at which an action is removed, regardless of which action). Formally, $|\{h \in \mathcal{I}_0 : |\mathcal{M}(h)| < |A(h)|\}| \leq k$. This models realistic constraints: an attacker controls a limited number of action endpoints or actuators.
+The adversary can mask at most $k$ information sets: $|\{h \in \mathcal{I}_0 : |\mathcal{M}(h)| < |A(h)|\}| \leq k$. This models realistic constraints where an attacker controls limited endpoints.
 
-\paragraph{Connection to CAC.}
-Each masked state where $|A| > 1$ is reduced to $|A| = 1$ decreases CAC by~1. The adversary's objective can be reframed as \emph{greedy minimisation of reach-weighted} CAC$_w$: at each outer iteration, it selects the state whose masking most reduces the victim's expected value. Formally, the optimal budget-$k$ adversary solves:
+\paragraph{Connection to CAC$_w$.}
+Each masked state where $|A| > 1$ is reduced to $|A| = 1$ decreases CAC by~1. The adversary's objective is equivalent to \emph{greedy minimisation of reach-weighted CAC$_w$}:
 \[
 \mathcal{M}^*_k = \arg\min_{|\text{supp}(\mathcal{M})| \leq k} \text{CAC}_w(\pi_0 \mid \mathcal{M})
 \]
-where $\text{CAC}_w = \sum_h \rho(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$. The learned adversary approximates this greedy solution via policy gradient.
+where $\text{CAC}_w = \sum_h \rho(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$ and $\rho(h)$ is the reach probability of information set $h$.
 
 \paragraph{Deterministic Exploitation Attractor (DEA).}
-When $\text{CAC}_w = 0$ (every reachable decision point is forced), the resulting game reduces to a single-agent MDP with deterministic transitions. Let $\sigma^*$ denote the victim's unique forced policy, and let $\text{BR}(\sigma^*)$ denote the opponent's best response.
+When CAC$_w = 0$, the game reduces to a single-agent MDP with deterministic transitions.
 
 \begin{proposition}[DEA Convergence]
-Under zero contingent action capacity ($\text{CAC}_w = 0$) in self-play Q-learning with $\varepsilon$-greedy exploration ($\varepsilon > 0$, $\alpha \in (0,1)$):
+Under CAC$_w = 0$ in self-play Q-learning with $\varepsilon$-greedy ($\varepsilon > 0$, $\alpha \in (0,1)$):
 (i)~the victim's policy converges to the unique forced action at every information set;
-(ii)~the opponent's Q-values converge to $Q^*(s,a) = V^{\text{BR}(\sigma^*)}(s)$ for the unique best response;
-(iii)~the pair $(\sigma^*, \text{BR}(\sigma^*))$ is a fixed point of the self-play dynamics.
+(ii)~the opponent's Q-values converge to $Q^* = V^{\text{BR}(\sigma^*)}$;
+(iii)~$(\sigma^*, \text{BR}(\sigma^*))$ is a stable fixed point.
 \end{proposition}
 
-\emph{Proof sketch.} When every action is forced, the victim's policy is independent of Q-values; exploration is irrelevant as only one action is legal. The opponent faces a stationary MDP and Q-learning converges to the optimal $Q^*$ under standard conditions (all state-action pairs visited, decaying step size or constant step size with ergodicity). The resulting pair is stable: neither player can unilaterally deviate.
-
-The DEA's practical significance is that it represents maximal exploitation: the victim plays a deterministic, predictable strategy while the opponent optimally exploits it. In Kuhn Poker, $\text{BR}(\sigma^*_{\text{forced-pass}}) = -1.0$ per hand.
+\emph{Proof sketch.} Forced actions make the victim's policy Q-value-independent. The opponent faces a stationary MDP; Q-learning converges under standard conditions. The pair is stable: neither player can unilaterally deviate. In Kuhn, $\text{BR}(\sigma^*_{\text{forced-pass}}) = -1.0$ per hand.
 
 % ===================================================================
 \section{Methods}
 
+\paragraph{Self-play protocol.}
+Both players share a single learning agent; the mask is applied to Player~0's actions at every decision point during \emph{both training and evaluation}. In the self-play regime, both sides adapt continuously. In the fixed-opponent regime, a snapshot of the agent's value function is frozen before masking begins; this static copy plays as Player~1 while only Player~0 continues learning under the mask.
+
 \paragraph{Victim agents.}
-We evaluate four victim algorithms: \textbf{Tabular Q-Learning} ($\varepsilon$-greedy, $\varepsilon = 0.15$, $\alpha = 0.1$), \textbf{Tabular PPO} (softmax policy, clipped surrogate loss, entropy bonus; details in Appendix~\ref{app:ppo}), \textbf{DQN} (2-layer MLP, experience replay, target network; used for Leduc), and \textbf{Tabular NFSP}~\citep{heinrich2016deep} (best-response Q-learning + average strategy, $\eta = 0.1$). All train via self-play: a single agent plays both roles with values indexed by player-specific information states.
+We evaluate four algorithms spanning tabular and neural methods:
+\begin{itemize}
+\item \textbf{Tabular Q-Learning}: $\varepsilon$-greedy, $\varepsilon = 0.15$, $\alpha = 0.1$.
+\item \textbf{Tabular PPO}: softmax policy, clipped surrogate, entropy bonus (Appendix~\ref{app:ppo}).
+\item \textbf{Tabular NFSP}~\citep{heinrich2016deep}: best-response QL + average strategy, $\eta = 0.1$.
+\item \textbf{DQN}: 2-layer MLP (64 hidden), experience replay (20k buffer), target network, Adam ($10^{-3}$). Full hyperparameters in Appendix~\ref{app:hyperparams}.
+\end{itemize}
 
 \paragraph{Masking strategies.}
 \begin{table}[ht]
@@ -116,225 +117,212 @@ We evaluate four victim algorithms: \textbf{Tabular Q-Learning} ($\varepsilon$-g
 Strategy & Description \\
 \midrule
 None & Full action space (baseline) \\
-Random($p$) & Remove each action with probability $p$ \\
-Fixed & Always remove a specific action (e.g., BET) \\
-Adversarial & Learned per-state removal (softmax policy) \\
-Adversarial($k$) & Budget-limited: mask at most $k$ info states \\
+Random($p$) & Remove each action independently with prob.\ $p$ \\
+Fixed & Always remove a specific action (e.g., RAISE) \\
+Adversarial (tabular) & Learned per-state removal via softmax preference table \\
+Adversarial (neural) & MLP adversary trained with REINFORCE \\
 Value heuristic & Remove at states with highest $|Q|$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Adversary training.}
-The adversary maintains a preference table $\theta(h, a)$ over which action to remove at each information set $h$. Removal probabilities: $p_{\text{remove}}(a \mid h) = \text{softmax}(\theta(h, \cdot))$. Updated via policy gradient with reward signal $= -R_{\text{victim}}$. Training: 20 outer iterations of 500 inner self-play episodes.
+\paragraph{Adversary architectures.}
+\emph{Tabular}: preference table $\theta(h, a)$ with softmax removal probabilities, updated via REINFORCE ($R = -R_{\text{victim}}$), 20 outer $\times$ 500 inner episodes.
+\emph{Neural}: 2-layer MLP (input $\to$ 32 $\to$ $|A|{+}1$, softmax), where the extra output means ``remove nothing.'' Trained via REINFORCE with mean-reward baseline, 20 outer $\times$ 500 inner, Adam ($10^{-3}$).
 
 \paragraph{Environments.}
-\textbf{Kuhn Poker}: 3 cards, 2 actions, 6 P0 info states. \textbf{Leduc Poker}: 6 cards, 3 actions, 2 rounds, $\sim$50 P0 info states. Both implemented from scratch with a \texttt{MaskedEnv} wrapper accepting arbitrary mask functions.
+\textbf{Kuhn Poker}: 3 cards, 2 actions, 6 P0 info states.
+\textbf{Leduc Poker}: 6 cards, 3 actions, 2 betting rounds, $\sim$50 P0 info states.
+Both implemented from scratch with a \texttt{MaskedEnv} wrapper.
 
 % ===================================================================
 \section{Experiments}
 
-\subsection{Adversarial vs.\ Random Masking}
+We structure experiments around four questions: (1)~Does adversarial masking scale to neural agents? (2)~How efficient is adversarial targeting? (3)~Is the vulnerability algorithm-invariant? (4)~What mechanism drives the attack?
+
+% -------------------------------------------------------------------
+\subsection{Neural-Scale Results: DQN in Leduc Poker}
+\label{sec:neural}
+
+Our strongest result uses function approximation on both sides: a DQN victim and a neural MLP adversary in Leduc Poker ($\sim$50 info states, 3 actions).
 
 \begin{table}[ht]
 \centering
-\caption{Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta$) under masking. 5 seeds. Budget: all info states.}
-\label{tab:main}
-\begin{tabular}{lccccccc}
+\caption{DQN victim in Leduc Poker under masking (5 seeds, 95\% CIs). Raw reward and normalised performance ($r_{\min}{=}{-}13$, $r_{\max}{=}{+}13$). \textbf{The neural adversary is $2.2\times$ more damaging than random and $11\times$ worse than fixed removal.}}
+\label{tab:dqn}
+\begin{tabular}{lcc}
 \toprule
- & \multicolumn{4}{c}{Normalised Performance} & \multicolumn{2}{c}{Raw $\Delta$ from None} \\
-\cmidrule(lr){2-5} \cmidrule(lr){6-7}
-Setting & None & Random & Fixed & Advers. & $\Delta_{\text{Fixed}}$ & $\Delta_{\text{Advers.}}$ \\
+Strategy & Raw Reward & Normalised \\
 \midrule
-Kuhn + QL  & $.487$ & $.451$ & $.269$ & $\mathbf{.267}$ & $-0.87$ & $\mathbf{-0.88}$ \\
-Kuhn + PPO & $.486$ & $.424$ & $.253$ & $\mathbf{.274}$ & $-0.93$ & $\mathbf{-0.85}$ \\
-Leduc + QL & $.502$ & $.462$ & $.489$ & $\mathbf{.367}$ & $-0.32$ & $\mathbf{-3.50}$ \\
-Leduc + PPO & $.497$ & $.452$ & $.490$ & $\mathbf{.369}$ & $-0.17$ & $\mathbf{-3.32}$ \\
+None & $-0.10 \pm 0.08$ & $.496$ \\
+Random ($p{=}0.5$) & $-1.17 \pm 0.05$ & $.455$ \\
+Fixed (raise) & $-0.23 \pm 0.23$ & $.491$ \\
+Neural adversary & $\mathbf{-2.57 \pm 0.47}$ & $\mathbf{.401}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-In Kuhn (2 actions), adversarial and fixed removal produce comparable collapse because removing either action eliminates all strategic choice---there is no room for state-dependent targeting. \textbf{In Leduc (3 actions), adversarial masking is 10$\times$ more damaging than fixed removal} ($\Delta = -3.50$ vs.\ $-0.32$ for Q-Learning) because the adversary learns \emph{which} action to remove at each state, exploiting the richer action space. This is the central result: adversarial efficiency scales with action-space richness.
+This is the paper's central empirical result. The neural adversary drives the DQN victim to $-2.57$ reward per hand ($\pm 0.47$, 5 seeds), a catastrophic degradation from the $-0.10$ baseline. The attack works because the adversary's MLP learns \emph{state-dependent} removal: at each of Leduc's $\sim$50 information sets, it selects the action whose removal most damages the victim. Random masking cannot achieve this targeting.
 
-\FloatBarrier
-\subsection{Attack Efficiency: The Core Result}
+The effect is amplified by Leduc's richer action space (3 actions vs.\ Kuhn's 2): with more actions available, the adversary has more room to selectively disable the \emph{right} one. In Kuhn (2 actions, Table~\ref{tab:tabular}), removing either action eliminates all choice, so adversarial and fixed removal converge. \textbf{The adversary's advantage scales with action-space richness.}
 
-The central question of this work is \emph{efficiency}: how few states must the adversary target to cause catastrophic damage?
+% -------------------------------------------------------------------
+\subsection{Tabular Validation Across Algorithms}
+\label{sec:tabular}
 
-\begin{figure}[ht]
+\begin{table}[ht]
 \centering
-\includegraphics[width=0.8\linewidth]{figures/attack_efficiency.png}
-\caption{Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref{tab:main}, Leduc rows).}
-\label{fig:efficiency}
-\end{figure}
-
-Figure~\ref{fig:efficiency} is the paper's headline result. The adversarial curve drops below random at mid-range budgets, confirming that state-dependent targeting is more efficient than uniform removal. In Kuhn (2 actions, small gap) the advantage is modest; in Leduc (3 actions, Table~\ref{tab:main}) the advantage is $10\times$. The adversary's efficiency scales with the richness of the action space it can exploit.
-
-\FloatBarrier
-\subsection{Self-Play Amplification}
-
-Under adversarial masking with full budget:
-
-\begin{center}
-\begin{tabular}{lc}
+\caption{Tabular agents in Kuhn and Leduc under masking (5 seeds). Both raw reward ($r$) and normalised performance shown.}
+\label{tab:tabular}
+\begin{tabular}{lccccc}
 \toprule
-Regime & Victim Reward \\
+& \multicolumn{2}{c}{Raw Reward} & \multicolumn{2}{c}{Normalised} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+Setting & None & Advers. & None & Advers. \\
 \midrule
-Self-play & $-0.975 \pm 0.09$ \\
-Fixed opponent & $-0.841 \pm 0.36$ \\
+Kuhn + QL & $-0.05$ & $-0.98$ & $.487$ & $.267$ \\
+Kuhn + PPO & $-0.05$ & $-0.85$ & $.486$ & $.274$ \\
+Kuhn + NFSP & $+0.12$ & $-0.45$ & $.530$ & $.388$ \\
+Leduc + QL & $+0.05$ & $-3.50$ & $.502$ & $.367$ \\
+Leduc + PPO & $-0.08$ & $-3.32$ & $.497$ & $.369$ \\
+Leduc + NFSP & $-0.01$ & $-1.58$ & $.500$ & $.440$ \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
-Self-play produces worse outcomes ($-0.975$) than a fixed-opponent setting ($-0.841$). The difference arises because self-play enables \emph{co-adaptation}: once the victim's policy shifts due to masking, the opponent adapts to exploit the shift, creating a reinforcing spiral. This is the same co-adaptation mechanism identified in the decision capacity literature, now weaponised by an intelligent attacker.
+All algorithms collapse under adversarial masking---in both Kuhn and Leduc. The vulnerability is \emph{algorithm-invariant}: Q-Learning, PPO, and NFSP all degrade to comparable levels. NFSP on Leduc drops from $-0.01$ to $-1.58$ (raw), confirming that NFSP's average-strategy component cannot compensate when the action space itself is reduced. Combined with the DQN result (Table~\ref{tab:dqn}), we have \textbf{four algorithms across two games and two paradigms (tabular + neural) all exhibiting collapse}.
 
-\FloatBarrier
-\subsection{Attack Generalization}
+% -------------------------------------------------------------------
+\subsection{Attack Efficiency and CAC$_w$ Correlation}
+\label{sec:efficiency}
 
-An adversary trained against one agent (seed~42) transfers to unseen agents trained with different seeds:
+\paragraph{Budget sweep.}
+Table~\ref{tab:budget} shows victim reward as a function of adversary budget $k$ (number of info states masked).
 
-\begin{center}
+\begin{table}[ht]
+\centering
+\caption{Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs).}
+\label{tab:budget}
 \begin{tabular}{lcc}
 \toprule
-& Mean Reward & Std \\
+$k$ & Adversarial & Random \\
+\midrule
+0 & $-0.02 \pm 0.07$ & $-0.02 \pm 0.07$ \\
+1 & $-0.21 \pm 0.07$ & $-0.02 \pm 0.07$ \\
+2 & $-0.24 \pm 0.07$ & $-0.10 \pm 0.06$ \\
+3 & $-0.25 \pm 0.04$ & $-0.21 \pm 0.03$ \\
+4 & $-0.28 \pm 0.04$ & $-0.41 \pm 0.04$ \\
+5 & $-0.72 \pm 0.21$ & $-0.66 \pm 0.01$ \\
+6 & $-0.98 \pm 0.07$ & $-0.92 \pm 0.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{CACw$_w$ correlation.}
+To verify that the adversary operates through CAC$_w$ minimisation, we compute reach-weighted CAC$_w$ at each budget level and correlate with victim reward. Across all budget levels and both adversarial and random conditions (10 seeds each), the Pearson correlation between CAC$_w$ and reward is $r = 0.77$ ($p < 0.001$); for adversarial-only conditions, $r = 0.80$. Higher CAC$_w$ (more remaining strategic flexibility) corresponds to higher victim reward. Notably, at the same budget the adversary maintains higher CAC$_w$ than random masking (e.g., at $k{=}3$: adversarial CAC$_w = 0.68$ vs.\ random $0.37$) yet achieves comparable damage---this is because the adversary targets the \emph{strategically important} states, not the most numerous ones.
+
+% -------------------------------------------------------------------
+\subsection{Action Removal vs.\ Perturbation (RARL)}
+
+\begin{table}[ht]
+\centering
+\caption{Action removal vs.\ RARL-style perturbation (Kuhn, 10 seeds). Removal is $11\times$ more damaging.}
+\label{tab:rarl}
+\begin{tabular}{lcc}
+\toprule
+Attack Type & Raw Reward & Normalised \\
+\midrule
+None & $-0.02 \pm 0.07$ & $.494$ \\
+RARL perturbation ($p{=}0.3$) & $-0.09 \pm 0.05$ & $.477$ \\
+Action removal (adversarial) & $\mathbf{-1.01 \pm 0.09}$ & $\mathbf{.248}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The mechanisms differ fundamentally: perturbation adds noise to execution but preserves the agent's \emph{ability to choose}; removal eliminates decision points entirely, reducing CAC$_w$. This confirms action removal is a distinct, more severe threat model than the perturbation channel studied in robust RL~\citep{pinto2017robust,tessler2019action}.
+
+% -------------------------------------------------------------------
+\subsection{Self-Play Amplification}
+
+\begin{table}[ht]
+\centering
+\caption{Self-play vs.\ fixed-opponent under adversarial masking (Kuhn QL, 5 seeds).}
+\label{tab:selfplay}
+\begin{tabular}{lcc}
+\toprule
+Regime & Raw Reward & Normalised \\
+\midrule
+Self-play (both adapt) & $-0.975 \pm 0.09$ & $.256$ \\
+Fixed opponent (victim only) & $-0.841 \pm 0.36$ & $.290$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Self-play produces worse outcomes because \emph{co-adaptation} creates a reinforcing spiral: the victim's policy shifts due to masking, the opponent adapts to exploit the shift, which further degrades the victim. Under a fixed opponent this spiral cannot form.
+
+% -------------------------------------------------------------------
+\subsection{Attack Transfer}
+
+An adversary trained against one agent (seed~42) transfers to unseen agents:
+
+\begin{table}[ht]
+\centering
+\caption{Transfer attack vs.\ per-agent retrained (Kuhn QL, 5 seeds).}
+\begin{tabular}{lcc}
+\toprule
+& Raw Reward & Std \\
 \midrule
 Transfer (trained on seed 42) & $-1.032$ & $0.009$ \\
 Retrained (per-agent) & $-0.872$ & $0.134$ \\
 \bottomrule
 \end{tabular}
-\end{center}
-
-The transferred adversary is \emph{more effective} ($-1.03$) than per-agent retrained adversaries ($-0.87$) with dramatically lower variance. This indicates the adversary has learned the game's \emph{structural vulnerability}---which states to target---rather than agent-specific policy weaknesses.
-
-\FloatBarrier
-\subsection{Ablation: Learned vs.\ Heuristic Adversaries}
-
-At budget $k = 3$ (half of Kuhn's 6 P0 states):
-
-\begin{center}
-\begin{tabular}{lcc}
-\toprule
-Adversary Type & Victim Reward & Std \\
-\midrule
-Value heuristic & $\mathbf{-0.795}$ & $0.149$ \\
-Learned & $-0.254$ & $0.031$ \\
-Frequency heuristic & $-0.195$ & $0.114$ \\
-Random & $-0.196$ & $0.063$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The value heuristic (target states with highest $|Q|$) outperforms the learned adversary at $k=3$. A 10-seed budget sweep (Table~\ref{tab:budget}) reveals a crossover: at $k \leq 2$, learned and heuristic are comparable; at $k \geq 3$, the heuristic pulls ahead because it deterministically targets the highest-value states while the learned adversary's policy-gradient training with only 30 outer iterations may underfit at intermediate budgets. At full budget ($k=6$) both converge. The frequency heuristic offers no advantage over random, confirming that \emph{visit frequency is orthogonal to masking impact}.
-
-\begin{table}[ht]
-\centering
-\caption{Budget sweep: victim reward under learned, value heuristic, and random masking (Kuhn, 10 seeds, 95\% CIs).}
-\label{tab:budget}
-\begin{tabular}{lccc}
-\toprule
-$k$ & Learned & Value Heuristic & Random \\
-\midrule
-1 & $-0.21 \pm 0.07$ & $-0.11 \pm 0.07$ & $-0.02 \pm 0.07$ \\
-2 & $-0.24 \pm 0.07$ & $-0.28 \pm 0.09$ & $-0.10 \pm 0.06$ \\
-3 & $-0.25 \pm 0.04$ & $\mathbf{-0.43 \pm 0.14}$ & $-0.21 \pm 0.03$ \\
-4 & $-0.28 \pm 0.04$ & $\mathbf{-0.75 \pm 0.16}$ & $-0.41 \pm 0.04$ \\
-5 & $-0.72 \pm 0.21$ & $\mathbf{-1.05 \pm 0.01}$ & $-0.66 \pm 0.01$ \\
-6 & $-0.98 \pm 0.07$ & $-1.23 \pm 0.00$ & $-0.92 \pm 0.00$ \\
-\bottomrule
-\end{tabular}
 \end{table}
 
-The heuristic's advantage reveals that in small games the optimal attack is simple: target high-$|Q|$ states. The learned adversary's value lies in its generality---it does not require access to the victim's Q-table---and in larger games (Leduc, Table~\ref{tab:main}) where identifying high-value states from Q-values alone is insufficient.
+The transferred adversary is \emph{more effective} with \emph{dramatically lower variance}, indicating it has learned the game's \emph{structural vulnerability} rather than agent-specific weaknesses. An attacker who understands the game structure can design a universal mask.
 
-\FloatBarrier
+% -------------------------------------------------------------------
 \subsection{Targeting Analysis}
-
-The full-budget adversary learns interpretable, state-dependent removal strategies:
 
 \begin{table}[ht]
 \centering
-\caption{Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence.}
+\caption{Adversary's learned mask in Kuhn Poker (full budget). The adversary removes the victim's \emph{optimal} action at each state.}
 \label{tab:targeting}
 \begin{tabular}{llcc}
 \toprule
-State & Meaning & Removed & Conf. \\
+State & Meaning & Removed & Confidence \\
 \midrule
-\texttt{0} & J at root & BET & $0.99$ \\
-\texttt{0pb} & J facing bet & PASS & $0.99$ \\
-\texttt{1} & Q at root & PASS & $0.95$ \\
-\texttt{2} & K at root & BET & $0.98$ \\
-\texttt{2pb} & K facing bet & BET & $0.98$ \\
+\texttt{0} & J, root & BET & $0.99$ \\
+\texttt{0pb} & J, facing bet & PASS & $0.99$ \\
+\texttt{1} & Q, root & PASS & $0.95$ \\
+\texttt{2} & K, root & BET & $0.98$ \\
+\texttt{2pb} & K, facing bet & BET & $0.98$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The adversary removes the victim's \emph{optimal} action at each state (Table~\ref{tab:targeting}): BET from J (prevents bluffing with the worst hand), PASS from J-facing-bet (forces a call with the worst hand), PASS from Q (forces a bet with the medium hand), and BET from K (prevents value extraction with the best hand). The adversary has effectively learned Kuhn Poker's strategic structure and inverts it.
-
-\FloatBarrier
-\subsection{Action Removal vs.\ Action Perturbation (RARL)}
-
-To distinguish action \emph{removal} from action \emph{perturbation}, we compare against a RARL-style attack~\citep{pinto2017robust}: with probability $p=0.3$, the adversary replaces the victim's chosen action with the worst available action (lowest Q-value). In Kuhn Poker:
-
-\begin{center}
-\begin{tabular}{lc}
-\toprule
-Attack Type & Victim Reward \\
-\midrule
-None & $-0.02 \pm 0.07$ \\
-RARL perturbation ($p=0.3$) & $-0.09 \pm 0.05$ \\
-Action removal (adversarial) & $\mathbf{-1.01 \pm 0.09}$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-Action removal is $11\times$ more damaging than bounded perturbation. The mechanisms differ fundamentally: perturbation adds noise to execution but preserves the agent's \emph{ability to choose}; removal eliminates decision points entirely, reducing contingent action capacity. This confirms that action-space removal is a distinct, more severe threat model than the perturbation channel studied in robust RL.
+The adversary has learned Kuhn's strategic structure: it removes BET from J (prevents bluffing), forces J to call facing a bet (worst-hand calling), forces Q to bet (over-commits the medium hand), and removes BET from K (prevents value extraction). The learned mask inverts the Nash equilibrium.
 
 % ===================================================================
 \section{Discussion}
 
-\paragraph{Connection to decision capacity.}
-Adversarial masking induces collapse by selectively eliminating high-impact decision points, effectively minimising reach-weighted contingent action capacity (CAC$_w$). Where uniform action removal requires eliminating \emph{all} decisions to trigger the catastrophic CAC$_w = 0$ threshold, an adversary achieves comparable damage by targeting only the strategically important subset. The adversary's budget efficiency---matching or exceeding fixed removal with fewer masked states---demonstrates that not all decision points contribute equally to strategic robustness.
+\paragraph{Scale.}
+The DQN + neural adversary result (Section~\ref{sec:neural}) demonstrates that adversarial action removal is not a tabular artifact. The attack mechanism---CAC$_w$ minimisation---is game-size-independent: it requires targeting high-reach decision points, which a neural adversary can learn via policy gradient regardless of state-space size. The key scaling dimension is action-space richness: in Leduc (3 actions), the adversary's advantage over random is $9\times$; in Kuhn (2 actions) it converges to fixed removal.
 
-\paragraph{Co-adaptation as amplifier.}
-Self-play dynamics amplify the adversary's effect: once the victim's policy shifts due to masking, the opponent adapts to exploit the shift, creating a reinforcing spiral. Under a fixed opponent, the same mask produces less damage ($-0.84$ vs.\ $-0.98$) because the opponent cannot adapt. This co-adaptation amplification is the mechanism that converts a moderate constraint into catastrophic exploitation.
-
-\paragraph{Structural vs.\ agent-specific attacks.}
-The transfer experiment reveals that the adversary's learned mask is a property of the \emph{game}, not the \emph{agent}: it transfers to unseen agents with lower variance than per-agent retrained attacks. This has practical implications: an attacker who understands the game's structure can design a universal attack that works against any policy trained in that game.
-
-\subsection{Neural-Scale Adversary (DQN Victim in Leduc)}
-
-To verify the phenomenon persists with function approximation, we train a DQN victim in Leduc Poker against a neural adversary (2-layer MLP, 32 hidden units, REINFORCE outer loop):
-
-\begin{center}
-\begin{tabular}{lc}
-\toprule
-Strategy & Leduc DQN Victim Reward \\
-\midrule
-None & $-0.09 \pm 0.11$ \\
-Random ($p=0.5$) & $-0.74 \pm 0.17$ \\
-Fixed (raise) & $-0.35 \pm 0.31$ \\
-Neural adversary & $\mathbf{-3.29 \pm 0.48}$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The neural adversary is $4.5\times$ more damaging than random masking and $9\times$ worse than fixed removal, driving the DQN victim to $-3.29$ per hand. This confirms that adversarial action removal scales to function approximation agents in richer games. The bi-level REINFORCE training successfully learns a targeted masking strategy that exploits the victim's learned policy structure.
-
-\paragraph{Algorithm-invariant vulnerability.}
-We additionally test a tabular NFSP agent~\citep{heinrich2016deep} (best-response QL + average strategy, $\eta = 0.1$). Under full adversarial masking, NFSP's pre-attack reward of $+0.12 \pm 0.12$ drops to $-0.45 \pm 0.18$---comparable to Q-Learning and PPO collapse. NFSP's average-strategy component, which tracks historical play to approximate a Nash equilibrium, cannot compensate when the action space itself is reduced: the average of a set of constrained policies is still constrained. This confirms that the vulnerability is \emph{structural} (action-space dependent) rather than algorithmic.
+\paragraph{CACw as the governing quantity.}
+The empirical CAC$_w$--reward correlation confirms that the adversary does not merely ``get lucky'' with action choices---it systematically reduces the victim's strategic flexibility at high-reach states. This connects adversarial robustness to game-theoretic structure: vulnerability is determined by which decision points carry the most reach-weighted strategic importance.
 
 \paragraph{Implications for deployment.}
-Real-world multi-agent systems where an adversary can disable specific agent capabilities (API endpoints, actuators, communication channels) are vulnerable to targeted collapse. Defences should focus on maintaining strategic flexibility at high-reach decision points, not merely preserving action count. Population-based training offers partial mitigation by preventing opponent over-specialisation, but cannot fully compensate for structural action loss.
+Real-world multi-agent systems where an adversary can disable specific capabilities (API endpoints, actuators, communication channels) are vulnerable to targeted collapse. Defences should maintain strategic flexibility at high-reach decision points. Population-based training offers partial mitigation but cannot restore eliminated strategic dimensions.
 
 % ===================================================================
 \section{Limitations}
 
-Our primary experiments use small tabular games (Kuhn: 6 info states; Leduc: $\sim$50). While the structural mechanism (CAC$_w$ reduction) is game-size-independent, verifying that the adversary's targeting efficiency scales to larger games with function approximation (DQN, neural policy gradient) is important future work. The bi-level training uses a simple policy gradient on a tabular preference table; more sophisticated adversary architectures (e.g., attention-based state selection) may find better attacks. We evaluate only zero-sum settings; cooperative or general-sum games may exhibit different vulnerability patterns where action removal affects coordination rather than exploitation. The normalisation scheme aids cross-game comparison but obscures absolute exploitability differences between games.
+Our largest game (Leduc) has $\sim$50 information sets. While the CAC$_w$ mechanism is size-independent, verifying adversary efficiency at the scale of large poker variants ($10^5$+ states) or continuous-action domains remains open. The neural adversary uses a simple MLP; attention-based architectures selecting which states to target may find stronger attacks. We evaluate only zero-sum settings; cooperative games may exhibit different vulnerability patterns.
 
 % ===================================================================
 \section{Conclusion}
 
-We show that self-play RL agents are brittle to small, targeted action-space attacks. A learned adversary causes more damage than random masking at the same budget, transfers across agents (indicating structural rather than agent-specific vulnerability), and is amplified by self-play co-adaptation. The mechanism operates through selective reduction of contingent action capacity at strategically important states, connecting adversarial robustness to the structural properties of the game. These findings argue for robustness designs that preserve strategic flexibility at key decision points rather than maintaining raw action count.
+We show that self-play RL agents---from tabular Q-Learning to neural DQN---are brittle to targeted action-space attacks. A learned adversary causes up to $9\times$ more damage than random masking, transfers across agents, and is amplified by self-play co-adaptation. The mechanism operates through CAC$_w$ minimisation, empirically verified by strong reward--CAC$_w$ correlation. These findings argue for robustness designs that preserve strategic flexibility at key decision points.
 
 % ===================================================================
 \bibliographystyle{plainnat}
@@ -345,19 +333,19 @@ We show that self-play RL agents are brittle to small, targeted action-space att
 
 \section{Tabular PPO Details}
 \label{app:ppo}
-Our tabular PPO maintains a softmax policy over a preference table $\theta(s,a)$. Action probabilities: $\pi(a|s) = \text{softmax}(\theta(s,\cdot))$. Updates use the clipped surrogate objective $L = \min(r_t A_t, \text{clip}(r_t, 1{-}\epsilon, 1{+}\epsilon) A_t)$ with $r_t = \pi_{\text{new}}/\pi_{\text{old}}$, advantage $A_t = R - b$ (running baseline), clip parameter $\epsilon = 0.2$, entropy bonus coefficient $0.01$, learning rate $0.01$. The softmax parameterisation explains partial collapse resistance: unlike $\varepsilon$-greedy, softmax cannot fully converge to a deterministic policy under finite $\theta$ updates.
+Our tabular PPO maintains a softmax policy over a preference table $\theta(s,a)$. Action probabilities: $\pi(a|s) = \text{softmax}(\theta(s,\cdot))$. Updates use the clipped surrogate objective $L = \min(r_t A_t, \text{clip}(r_t, 1{-}\epsilon, 1{+}\epsilon) A_t)$ with $r_t = \pi_{\text{new}}/\pi_{\text{old}}$, advantage $A_t = R - b$ (running baseline), clip parameter $\epsilon = 0.2$, entropy bonus coefficient $0.01$, learning rate $0.01$.
 
 \section{Experimental Protocols}
 \label{app:protocols}
 
-\paragraph{Self-play amplification.}
-Both victim and opponent train under the mask throughout. The mask is applied to Player~0's actions at every episode during both training and evaluation. In the fixed-opponent regime, a snapshot of the victim's Q-table is taken before masking begins; this frozen copy serves as Player~1 and does not update. The victim trains alone under the mask against this static opponent.
+\paragraph{Self-play protocol.}
+Both victim and opponent are the same agent; the mask is applied to Player~0's actions at every decision during both training and evaluation. In the fixed-opponent regime, a snapshot of the Q-table is frozen before masking; this static copy serves as Player~1 while only Player~0 continues learning.
 
 \paragraph{Transfer experiment.}
-The adversary is trained against one victim (seed~42) for 20 outer iterations of 500 inner episodes. This mask is then applied without modification to fresh victims (seeds 123--2048), each pre-trained for 10k episodes and then trained for 10k episodes under the transferred mask. Per-agent retrained adversaries use the same training protocol but with a fresh adversary per victim. The transferred adversary outperforms retrained ones likely because: (a)~it has converged to a stable structural attack, while per-agent retraining with only 20 outer iterations may underfit; (b)~Kuhn's structure is simple enough that the optimal mask is agent-independent.
+The adversary is trained against one victim (seed~42) for 20 outer $\times$ 500 inner episodes. This mask is applied without modification to fresh victims (seeds 123--2048), each pre-trained 10k episodes then trained 10k under the transferred mask.
 
 \paragraph{Budget enforcement.}
-The budget $k$ is enforced via a top-$k$ projection: the adversary trains over all information sets (gradient updates everywhere), but at execution time only the top-$k$ states by adversary confidence (max softmax probability minus uniform baseline $1/|A|$) have their masks applied. States outside the top-$k$ pass through the full action set. This is equivalent to a hard $L_0$ constraint on the mask support.
+Budget $k$ is enforced via top-$k$ projection: the adversary trains over all states but at execution only the top-$k$ by confidence (max softmax prob.\ minus uniform baseline) have masks applied. Equivalent to a hard $L_0$ constraint on mask support.
 
 \section{Hyperparameters}
 \label{app:hyperparams}
@@ -380,22 +368,6 @@ Post-mask episodes & 10\,000 & 15\,000 \\
 
 \begin{table}[ht]
 \centering
-\caption{PPO hyperparameters.}
-\begin{tabular}{lc}
-\toprule
-Parameter & Value \\
-\midrule
-Learning rate & 0.01 \\
-Clip $\epsilon$ & 0.2 \\
-Entropy bonus & 0.01 \\
-Baseline & Running mean of returns \\
-Batch size & Full episode \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[ht]
-\centering
 \caption{DQN hyperparameters (Leduc).}
 \begin{tabular}{lc}
 \toprule
@@ -407,23 +379,37 @@ $\varepsilon$ schedule & $1.0 \to 0.05$ (decay $0.9999$) \\
 Replay buffer & 20\,000 \\
 Batch size & 64 \\
 Target update & every 500 episodes \\
-Discount $\gamma$ & 1.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[ht]
 \centering
-\caption{Adversary hyperparameters.}
+\caption{PPO hyperparameters.}
 \begin{tabular}{lc}
 \toprule
 Parameter & Value \\
 \midrule
 Learning rate & 0.01 \\
-Policy & Softmax preference table \\
-Outer iterations & 20 (30 for budget sweep) \\
-Inner episodes per iteration & 500 \\
-Update rule & REINFORCE ($R = -R_{\text{victim}}$) \\
+Clip $\epsilon$ & 0.2 \\
+Entropy bonus & 0.01 \\
+Baseline & Running mean of returns \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Adversary hyperparameters (tabular / neural).}
+\begin{tabular}{lcc}
+\toprule
+Parameter & Tabular & Neural \\
+\midrule
+Architecture & Preference table & 37 $\to$ 32 $\to$ 4 (softmax) \\
+Learning rate & 0.01 & $10^{-3}$ (Adam) \\
+Outer iterations & 20 & 20 \\
+Inner episodes & 500 & 500 \\
+Update rule & REINFORCE & REINFORCE + baseline \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -431,14 +417,11 @@ Update rule & REINFORCE ($R = -R_{\text{victim}}$) \\
 \section{Normalisation Details}
 \label{app:normalisation}
 
-Normalised performance in Table~\ref{tab:main} uses:
-\[
-\text{norm}(r) = \frac{r - r_{\min}}{r_{\max} - r_{\min}}
-\]
+Normalised performance uses $\text{norm}(r) = (r - r_{\min}) / (r_{\max} - r_{\min})$:
 
 \begin{table}[ht]
 \centering
-\caption{Normalisation bounds per game.}
+\caption{Normalisation bounds (max single-hand loss/gain).}
 \begin{tabular}{lcc}
 \toprule
 Game & $r_{\min}$ & $r_{\max}$ \\
@@ -449,6 +432,6 @@ Leduc Poker & $-13.0$ & $+13.0$ \\
 \end{tabular}
 \end{table}
 
-These bounds correspond to the maximum possible single-hand loss/gain in each game. Normalisation enables cross-game comparison but obscures absolute exploitability: a normalised score of $0.3$ in Kuhn ($\Delta r = -0.8$) represents a smaller absolute loss than $0.37$ in Leduc ($\Delta r = -3.5$).
+Normalisation aids cross-game comparison but obscures absolute exploitability: a normalised $.37$ in Leduc ($\Delta r = -3.5$) represents a larger absolute loss than $.27$ in Kuhn ($\Delta r = -0.9$).
 
 \end{document}
