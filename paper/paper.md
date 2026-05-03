@@ -1,4 +1,4 @@
-# Adversarial Action Removal in Self-Play Reinforcement Learning
+# When Actions Disappear: Adversarial Action Removal in Self-Play Reinforcement Learning
 
 **Arahan Kujur**  
 Independent Researcher  

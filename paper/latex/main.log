@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 17:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 17:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -507,7 +507,7 @@ T1/cmr/m/n/10 (\OML/cmm/m/it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 h\OT1/cmr/m
  []
 
 [3] [4]
-<figures/scaling_trend.pdf, id=232, 375.804pt x 231.26399pt>
+<figures/scaling_trend.pdf, id=231, 375.804pt x 231.26399pt>
 File: figures/scaling_trend.pdf Graphic file (type pdf)
 <use figures/scaling_trend.pdf>
 Package pdftex.def Info: figures/scaling_trend.pdf  used on input line 196.
@@ -519,6 +519,9 @@ File: figures/learning_curve_no_recovery.pdf Graphic file (type pdf)
 Package pdftex.def Info: figures/learning_curve_no_recovery.pdf  used on input 
 line 229.
 (pdftex.def)             Requested size: 286.18967pt x 176.12592pt.
+
+Underfull \vbox (badness 1997) has occurred while \output is active []
+
  [6 <./figures/learning_curve_no_recovery.pdf>]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
@@ -532,12 +535,12 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 296.
 
-<figures/budget_curve.pdf, id=346, 375.804pt x 231.26399pt>
+<figures/budget_curve.pdf, id=345, 375.804pt x 231.26399pt>
 File: figures/budget_curve.pdf Graphic file (type pdf)
 <use figures/budget_curve.pdf>
 Package pdftex.def Info: figures/budget_curve.pdf  used on input line 304.
 (pdftex.def)             Requested size: 262.34154pt x 161.44963pt.
-[7 <./figures/budget_curve.pdf>] [8] [9] (main.bbl [10])
+[7] [8 <./figures/budget_curve.pdf>] [9] (main.bbl [10])
 Underfull \hbox (badness 1158) in paragraph at lines 387--388
 \OT1/ptm/m/n/10 a-bil-i-ties: $\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/
 it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) = [](\OML/cmm/m/it
@@ -557,11 +560,11 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  11144 strings out of 467871
  171094 string characters out of 5418860
- 606974 words of memory out of 5000000
+ 601998 words of memory out of 5000000
  39731 multiletter control sequences out of 15000+600000
  651206 words of font info for 89 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,1340b,577s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,79p,1340b,585s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mbx10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmex10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -580,7 +583,7 @@ nts/symbols/msbm10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1
 /urw/times/utmb8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/
 urw/times/utmr8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on main.pdf (15 pages, 338026 bytes).
+Output written on main.pdf (15 pages, 338287 bytes).
 PDF statistics:
  580 PDF objects out of 1000 (max. 8388607)
  133 named destinations out of 1000 (max. 500000)

@@ -1,6 +1,6 @@
-# Adversarial Action Removal in Self-Play RL
+# When Actions Disappear
 
-This repository contains the experiments and paper source for **Adversarial Action Removal in Self-Play Reinforcement Learning**.
+This repository contains the experiments and paper source for **When Actions Disappear: Adversarial Action Removal in Self-Play Reinforcement Learning**.
 
 The paper studies a structural adversarial attack: instead of perturbing observations or replacing chosen actions, an attacker removes legal actions from the victim's available action set before action selection. The main finding is that targeted action removal is substantially more damaging than random masking or learned action perturbation, and the effect persists across algorithms, domains, and game sizes.
 
@@ -156,7 +156,7 @@ If you use this code, cite the repository or paper draft:
 
 ```bibtex
 @misc{kujur2026adversarialactionremoval,
-  title={Adversarial Action Removal in Self-Play Reinforcement Learning},
+  title={When Actions Disappear: Adversarial Action Removal in Self-Play Reinforcement Learning},
   author={Kujur, Arahan},
   year={2026},
   note={Preprint}
