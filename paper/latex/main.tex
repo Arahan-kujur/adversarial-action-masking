@@ -117,6 +117,9 @@ The optimal greedy adversary selects the $k$ states with highest $\rho(h) \cdot 
 
 \emph{Proof.} The bound follows from the definition of Q-values and linearity of expectation over the reach-weighted trajectory. At state $h^*$, forcing $a_f$ instead of $a^*$ loses $Q_0(h^*, a^*) - Q_0(h^*, a_f)$ in expectation, weighted by $\rho(h^*)$. The greedy selection follows from submodularity of the coverage function under independent masking.\footnote{Strict submodularity holds when masking one state does not change reach probabilities of others---approximately true when masked states are on different branches of the game tree.}
 
+\paragraph{Theoretical scope.}
+Propositions 1--2 provide \emph{sufficient conditions} and \emph{local bounds}, not a complete characterization of the optimal adversary. The damage bound is per-state and additive, ignoring cross-state interactions (masking state $h$ may shift reach probabilities and Q-values at downstream states). A global characterization would require solving a combinatorial optimisation over $\binom{|\mathcal{I}_0|}{k}$ mask configurations---NP-hard in general via reduction to weighted max coverage. The greedy approximation inherits a $(1 - 1/e)$ factor from the submodularity guarantee, but this holds exactly only under the independence assumption. We view these bounds as explaining \emph{why} the adversary works (targeting high $\rho \cdot \delta$ states) rather than fully characterizing \emph{how well} it can work.
+
 % ===================================================================
 \section{Methods}
 
@@ -419,8 +422,8 @@ The adversary has learned Kuhn's strategic structure: it removes BET from J (pre
 % ===================================================================
 \section{Discussion}
 
-\paragraph{Scaling law.}
-The scaling trajectory (Table~\ref{tab:scaling}) is the paper's strongest evidence. Excluding Kuhn (2-action ceiling effect), log-linear regression of adversary damage ratio on $\log_{10}(|\mathcal{I}_0|)$ yields $R^2 = 0.62$ (Pearson $r = 0.79$), with slope $1.56$: each $10\times$ increase in state space increases the adversary's advantage ratio by ${\sim}1.6\times$. The absolute damage gap (adversarial minus random reward) grows from $-1.40$ at 50 states to $-2.51$ at 1,496 states. The adversary's variance \emph{decreases} with scale (CI $\pm 0.47 \to \pm 0.15$), indicating more robust convergence in larger games where there is more targetable strategic heterogeneity. Neural NFSP ($2.3\times$ on Leduc-5) confirms this holds for properly neural game-solving methods.
+\paragraph{Scaling trend.}
+The scaling trajectory (Table~\ref{tab:scaling}) shows a consistent empirical trend. Excluding Kuhn (2-action ceiling effect), log-linear regression of adversary damage ratio on $\log_{10}(|\mathcal{I}_0|)$ yields $R^2 = 0.62$ (Pearson $r = 0.79$, $n = 4$ game sizes), with slope $1.56$. We report this as an \emph{empirical trend}, not a scaling law---four data points establish direction, not a precise functional form. The absolute damage gap (adversarial minus random reward) grows from $-1.40$ at 50 states to $-2.51$ at 1,496 states, and the adversary's variance \emph{decreases} with scale (CI $\pm 0.47 \to \pm 0.15$), suggesting more robust convergence in larger games where there is more targetable strategic heterogeneity. Neural NFSP ($2.3\times$ on Leduc-5) confirms this holds for properly neural game-solving methods.
 
 \paragraph{CACw: necessary but not sufficient.}
 The CAC$_w$--reward correlation ($r = 0.80$) is consistent with the hypothesis that reducing strategic flexibility drives performance degradation. However, CACw is a \emph{necessary} condition for collapse, not a complete characterization: at intermediate budgets, the adversary sometimes achieves comparable or greater damage with higher CACw than random masking (Table~\ref{tab:budget}, $k{=}3$: adversarial CACw $= 0.68$ vs.\ random $0.37$, yet adversarial reward $= -0.25$ vs.\ random $-0.21$). This occurs because CACw aggregates over all reachable states; the adversary targets the \emph{strategically pivotal} subset where action removal most disrupts equilibrium play, whereas random removal may eliminate more states but at less important ones. We test a refined measure, \emph{counterfactual-value-weighted capacity} $\text{CAC}_v = \sum_h \rho(h) \cdot |Q(h,a_0) - Q(h,a_1)| \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$, which weights each state by its Q-value gap (strategic importance). CAC$_v$ achieves Pearson $r = 0.81$ vs.\ CAC$_w$'s $r = 0.77$, confirming that incorporating value sensitivity improves the structural explanation. The remaining unexplained variance likely reflects higher-order interactions (e.g., how masking one state changes the value landscape at downstream states).
@@ -431,7 +434,13 @@ Real-world multi-agent systems where an adversary can disable specific capabilit
 % ===================================================================
 \section{Limitations}
 
-Our largest game (Leduc-20) has $\sim$5,500 information states---nearly three orders of magnitude larger than Kuhn. The \emph{monotonically increasing} adversary advantage with scale (Table~\ref{tab:scaling}: $2.2\times$ $\to$ $4.8\times$) strongly suggests the mechanism strengthens as games grow, but verification at full poker scale ($10^5$+ states) and in continuous-action domains remains open. The neural adversary uses a 3-layer MLP; more expressive architectures may find stronger attacks.
+Our largest game (Leduc-20) has $\sim$5,500 information states---nearly three orders of magnitude larger than Kuhn. The increasing adversary advantage with scale (Table~\ref{tab:scaling}) suggests the mechanism strengthens as games grow, but verification at full poker scale ($10^5$+ states) remains future work.
+
+\paragraph{Discrete scope.}
+Action removal is inherently a \emph{discrete} attack: it eliminates specific actions from a finite set. Our results---across poker, gridworld, and resource collection---all use small discrete action spaces ($|A| \leq 5$). In continuous-action domains (e.g., MuJoCo), the analogous attack would be \emph{region exclusion} (disabling subsets of the action manifold), which requires different formalisation and may exhibit qualitatively different dynamics. We do not claim generality beyond discrete action spaces.
+
+\paragraph{Theory.}
+The damage bound (Proposition~2) is local and additive, assuming independent masking effects across states. Cross-state interactions (masking one state shifts Q-values at others) are not captured. The scaling regression ($R^2 = 0.62$, 4 game sizes) establishes a trend but not a precise functional relationship.
 
 % ===================================================================
 \section{Conclusion}
