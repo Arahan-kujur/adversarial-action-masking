@@ -15,6 +15,9 @@ Thumbs.db
 results/*.csv
 results/*.npy
 
+# Local archives/uploads
+*.zip
+
 # IDE
 .vscode/
 .idea/
