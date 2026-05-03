@@ -18,6 +18,12 @@ results/*.npy
 # Local archives/uploads
 *.zip
 
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.blg
+
 # IDE
 .vscode/
 .idea/
