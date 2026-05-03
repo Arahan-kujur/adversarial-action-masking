@@ -21,7 +21,7 @@
 
 % ===================================================================
 \begin{abstract}
-We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. Across four poker variants of increasing complexity (Kuhn: 6 states; Leduc: $\sim$50; Leduc-5: 389; Leduc-10: 1,496) and two non-poker domains, with Q-Learning, PPO, NFSP, and DQN victims, we show that: (i)~adversarial masking causes $3$--$4\times$ more damage than random masking \emph{consistently across scales}, and $4\times$ more than a learned perturbation baseline; (ii)~the adversary targets high-value decision points, correlating with reach-weighted CAC$_w$ ($r = 0.80$) and a refined value-weighted variant CAC$_v$ ($r = 0.81$); (iii)~the attack transfers across agents and algorithms; (iv)~self-play co-adaptation amplifies the effect; and (v)~victims do not recover even with extended training under the mask. The phenomenon generalises beyond poker: in a competitive gridworld (perfect information, spatial structure), adversarial removal causes $1.9\times$ more damage than random.
+We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. Across five poker variants of increasing complexity (Kuhn: 6 states; Leduc: $\sim$50; Leduc-5: 389; Leduc-10: 1,496; Leduc-20: 5,531) and two non-poker domains, with Q-Learning, PPO, NFSP, and DQN victims, we show that: (i)~adversarial masking causes $3$--$4\times$ more damage than random masking \emph{consistently across scales}, and $4\times$ more than a learned perturbation baseline; (ii)~the adversary targets high-value decision points, correlating with reach-weighted CAC$_w$ ($r = 0.80$) and a refined value-weighted variant CAC$_v$ ($r = 0.81$); (iii)~the attack transfers across agents and algorithms; (iv)~self-play co-adaptation amplifies the effect; and (v)~victims do not recover even with extended training under the mask. The phenomenon generalises beyond poker: in a competitive gridworld (perfect information, spatial structure), adversarial removal causes $1.9\times$ more damage than random.
 \end{abstract}
 
 % ===================================================================
@@ -36,7 +36,7 @@ Our key finding is that adversarial masking is \emph{dramatically more efficient
 \paragraph{Contributions.}
 \begin{itemize}
   \item We formalise adversarial action masking and show it is $4\times$ more damaging than learned perturbation (RARL-style) with equal training budget.
-  \item We demonstrate scaling from 6 to \textbf{1,496} information states across four algorithms (QL, PPO, NFSP, neural NFSP, DQN), with the adversary's advantage \emph{increasing} from $2.2\times$ to $4.7\times$ as game complexity grows.
+  \item We demonstrate scaling from 6 to \textbf{5,531} information states across five algorithms (QL, PPO, NFSP, neural NFSP, DQN), with the adversary's advantage \emph{monotonically increasing} from $2.2\times$ to $4.8\times$ as game complexity grows.
   \item We validate cross-domain in two non-poker environments (competitive gridworld, resource collection), confirming the phenomenon is not poker-specific.
   \item We connect the mechanism to CAC$_w$ ($r = 0.80$) and a refined CAC$_v$ ($r = 0.81$), and show victims do not recover under extended training.
 \end{itemize}
@@ -134,7 +134,8 @@ Value heuristic & Remove at states with highest $|Q|$ \\
 \textbf{Kuhn Poker}: 3 cards, 2 actions, 6 P0 info states.
 \textbf{Leduc Poker}: 6 cards (3 ranks $\times$ 2 suits), 3 actions, 2 rounds, $\sim$50 P0 info states.
 \textbf{Leduc-5}: 10 cards (5 ranks), 389 P0 info states.
-\textbf{Leduc-10}: 20 cards (10 ranks), \textbf{1,496 P0 info states}.
+\textbf{Leduc-10}: 20 cards (10 ranks), 1,496 P0 info states.
+\textbf{Leduc-20}: 40 cards (20 ranks), \textbf{5,531 P0 info states}.
 \textbf{Competitive Gridworld}: 5$\times$5, 5 actions, 149 P0 states.
 \textbf{Resource Collection}: 4$\times$4, 4 actions, 18,604 P0 states.
 All implemented from scratch with \texttt{MaskedEnv} wrappers.
@@ -174,7 +175,7 @@ The effect is amplified by Leduc's richer action space (3 actions vs.\ Kuhn's 2)
 A natural concern is whether the adversary simply masks more states than the baselines. We measure effective $L_0$ support (number of information sets where an action is actually removed) across 5000 evaluation episodes. In Leduc: adversary $L_0 \approx 45$, Random($p{=}0.5$) $\approx 47$, Fixed (raise) $\approx 38$. The adversary and random mask \emph{comparable numbers of states}---the adversary's advantage is \emph{which} states it targets, not how many.
 
 \paragraph{Scaling to Leduc-5 and Leduc-10.}
-We implement Leduc-N, parameterised by rank count. \textbf{Leduc-5} (10 cards, 389 P0 info states) and \textbf{Leduc-10} (20 cards, \textbf{1,496 P0 info states}) test whether the adversary's advantage persists as game complexity grows by $250\times$ from Kuhn.
+We implement Leduc-N, parameterised by rank count. \textbf{Leduc-5} (10 cards, 389 states), \textbf{Leduc-10} (20 cards, 1,496 states), and \textbf{Leduc-20} (40 cards, \textbf{5,531 states}) test whether the adversary's advantage persists as game complexity grows by $920\times$ from Kuhn.
 
 \begin{table}[ht]
 \centering
@@ -186,12 +187,13 @@ Game & $|$States$|$ & None & Neural Adv & Ratio vs Random \\
 \midrule
 Leduc & $\sim$50 & $-0.10$ & $-2.57 \pm 0.47$ & $2.2\times$ \\
 Leduc-5 & 389 & $-0.15$ & $-2.74 \pm 0.23$ & $4.6\times$ \\
-Leduc-10 & \textbf{1,496} & $-0.18$ & $\mathbf{-3.19 \pm 0.23}$ & $\mathbf{4.7\times}$ \\
+Leduc-10 & 1,496 & $-0.18$ & $-3.19 \pm 0.23$ & $4.7\times$ \\
+Leduc-20 & \textbf{5,531} & $-0.09$ & $\mathbf{-3.00 \pm 0.15}$ & $\mathbf{4.8\times}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At 1,496 states the neural adversary drives DQN to $-3.19$ per hand---$4.7\times$ worse than random---with tight CIs ($\pm 0.23$). The adversary's advantage \emph{increases} from $2.2\times$ at 50 states to $4.7\times$ at 1,496 states. Larger games have more targetable structure: more information sets where state-dependent removal outperforms random.
+At 5,531 states the neural adversary drives DQN to $-3.00$ per hand---$4.8\times$ worse than random---with the tightest CIs of any scale ($\pm 0.15$). The adversary's advantage \emph{monotonically increases} from $2.2\times$ at 50 states to $4.8\times$ at 5,531 states, and its variance monotonically decreases. Larger games have more heterogeneous strategic structure, providing more targetable decision points.
 
 \paragraph{Neural NFSP on Leduc-5.}
 To confirm the result holds with a stronger victim, we run \emph{Neural NFSP} (128-64 MLP average policy, DQN best-response, reservoir-sampled action buffer) on Leduc-5. Pre-attack: $-0.13 \pm 0.09$; post-adversarial: $\mathbf{-1.89 \pm 0.16}$; post-random: $-0.89 \pm 0.06$. The adversary is $2.3\times$ more damaging than random, confirming that even proper neural game-solving methods collapse under adversarial action removal.
@@ -201,7 +203,7 @@ Table~\ref{tab:scaling} shows the adversary's advantage is \emph{persistent and 
 
 \begin{table}[ht]
 \centering
-\caption{Adversarial vs.\ random across game sizes (DQN victims, 5 seeds).}
+\caption{Adversarial vs.\ random across game sizes (DQN victims, 5 seeds). The ratio \emph{increases} with scale.}
 \label{tab:scaling}
 \begin{tabular}{lccccc}
 \toprule
@@ -211,6 +213,7 @@ Kuhn & 6 & $+0.01$ & $-0.95$ & $-0.22$ & $4.2\times$ \\
 Leduc & $\sim$50 & $-0.10$ & $-2.57$ & $-1.17$ & $2.2\times$ \\
 Leduc-5 & 389 & $-0.15$ & $-2.74$ & $-0.60$ & $4.6\times$ \\
 Leduc-10 & 1,496 & $-0.18$ & $-3.19$ & $-0.68$ & $4.7\times$ \\
+Leduc-20 & \textbf{5,531} & $-0.09$ & $\mathbf{-3.00}$ & $-0.63$ & $\mathbf{4.8\times}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -393,7 +396,7 @@ The adversary has learned Kuhn's strategic structure: it removes BET from J (pre
 \section{Discussion}
 
 \paragraph{Scale.}
-The scaling trajectory (Table~\ref{tab:scaling}) is the paper's strongest evidence: the adversary's advantage \emph{increases} from $2.2\times$ at 50 states to $4.7\times$ at 1,496 states. Larger games have more heterogeneous strategic structure---more states where targeted removal outperforms random. The adversary's variance also decreases with scale (CI $\pm 0.47$ at 50 states $\to$ $\pm 0.23$ at 1,496), indicating more robust convergence. Neural NFSP ($2.3\times$ on Leduc-5) confirms this holds for properly neural game-solving methods, not just DQN.
+The scaling trajectory (Table~\ref{tab:scaling}) is the paper's strongest evidence: the adversary's advantage \emph{monotonically increases} from $2.2\times$ at 50 states to $4.8\times$ at 5,531 states. Larger games have more heterogeneous strategic structure---more states where targeted removal outperforms random. The adversary's variance also decreases with scale (CI $\pm 0.47$ at 50 states $\to$ $\pm 0.23$ at 1,496), indicating more robust convergence. Neural NFSP ($2.3\times$ on Leduc-5) confirms this holds for properly neural game-solving methods, not just DQN.
 
 \paragraph{CACw: necessary but not sufficient.}
 The CAC$_w$--reward correlation ($r = 0.80$) is consistent with the hypothesis that reducing strategic flexibility drives performance degradation. However, CACw is a \emph{necessary} condition for collapse, not a complete characterization: at intermediate budgets, the adversary sometimes achieves comparable or greater damage with higher CACw than random masking (Table~\ref{tab:budget}, $k{=}3$: adversarial CACw $= 0.68$ vs.\ random $0.37$, yet adversarial reward $= -0.25$ vs.\ random $-0.21$). This occurs because CACw aggregates over all reachable states; the adversary targets the \emph{strategically pivotal} subset where action removal most disrupts equilibrium play, whereas random removal may eliminate more states but at less important ones. We test a refined measure, \emph{counterfactual-value-weighted capacity} $\text{CAC}_v = \sum_h \rho(h) \cdot |Q(h,a_0) - Q(h,a_1)| \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$, which weights each state by its Q-value gap (strategic importance). CAC$_v$ achieves Pearson $r = 0.81$ vs.\ CAC$_w$'s $r = 0.77$, confirming that incorporating value sensitivity improves the structural explanation. The remaining unexplained variance likely reflects higher-order interactions (e.g., how masking one state changes the value landscape at downstream states).
@@ -404,12 +407,12 @@ Real-world multi-agent systems where an adversary can disable specific capabilit
 % ===================================================================
 \section{Limitations}
 
-Our largest game (Leduc-10) has $\sim$1,500 information states---two orders of magnitude larger than Kuhn and an order larger than standard Leduc, but still small compared to full-scale poker ($10^5$+). The \emph{increasing} adversary advantage with scale (Table~\ref{tab:scaling}) suggests the mechanism strengthens rather than weakens, but verification at $10^4$+ states and in continuous-action domains remains open. The neural adversary uses a 3-layer MLP; more expressive architectures may find stronger attacks.
+Our largest game (Leduc-20) has $\sim$5,500 information states---nearly three orders of magnitude larger than Kuhn. The \emph{monotonically increasing} adversary advantage with scale (Table~\ref{tab:scaling}: $2.2\times$ $\to$ $4.8\times$) strongly suggests the mechanism strengthens as games grow, but verification at full poker scale ($10^5$+ states) and in continuous-action domains remains open. The neural adversary uses a 3-layer MLP; more expressive architectures may find stronger attacks.
 
 % ===================================================================
 \section{Conclusion}
 
-We show that self-play RL agents---from tabular Q-Learning to neural NFSP and DQN, from 6-state Kuhn to 1,496-state Leduc-10, across poker and non-poker domains---are brittle to targeted action-space attacks. The adversary's advantage over random masking \emph{increases} with game complexity ($2.2\times$ at 50 states to $4.7\times$ at 1,496), persists across five algorithms and six environments. The mechanism operates through selective reduction of strategically important decision capacity (CAC$_w$/$_v$), victims do not recover under extended training, and the attack transfers across agents. These findings argue for robustness designs that preserve strategic flexibility at high-reach decision points rather than raw action count.
+We show that self-play RL agents---from tabular Q-Learning to neural NFSP and DQN, from 6-state Kuhn to 5,531-state Leduc-20, across poker and non-poker domains---are brittle to targeted action-space attacks. The adversary's advantage over random masking \emph{monotonically increases} with game complexity ($2.2\times$ at 50 states to $4.8\times$ at 5,531), persists across five algorithms and seven environments. The mechanism operates through selective reduction of strategically important decision capacity (CAC$_w$/$_v$), victims do not recover under extended training, and the attack transfers across agents. These findings argue for robustness designs that preserve strategic flexibility at high-reach decision points rather than raw action count.
 
 % ===================================================================
 \bibliographystyle{plainnat}

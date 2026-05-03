@@ -111,6 +111,8 @@ def get_encoder(game: str):
         return _leduc_n_encoder(5)
     if game == "leduc10":
         return _leduc_n_encoder(10)
+    if game == "leduc20":
+        return _leduc_n_encoder(20)
     raise ValueError(f"Unknown game: {game}")
 
 
