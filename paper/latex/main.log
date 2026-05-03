@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 14:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 14:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -485,22 +485,30 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 
 
 {C:/Users/Noah/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Noah/
-AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] [2] [3] [4]
-[5]
+AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
+Underfull \hbox (badness 7907) in paragraph at lines 81--83
+ []\OT1/ptm/b/n/10 Adversary im-ple-men-ta-tion.[] \OT1/ptm/m/it/10 Tab-u-lar\O
+T1/ptm/m/n/10 : pref-er-ence ta-ble $\OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 (\OML/
+cmm/m/it/10 h; a\OT1/cmr/m/n/10 )$ \OT1/ptm/m/n/10 with $\OML/cmm/m/it/10 p[]\O
+T1/cmr/m/n/10 (\OML/cmm/m/it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 h\OT1/cmr/m
+/n/10 ) =
+ []
+
+[2] [3] [4] [5]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 280.
+(hyperref)                removing `math shift' on input line 304.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 280.
+(hyperref)                removing `subscript' on input line 304.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 280.
+(hyperref)                removing `math shift' on input line 304.
 
-[6] [7] (main.bbl [8])
-Underfull \hbox (badness 1158) in paragraph at lines 426--427
+[6] [7] [8] (main.bbl [9])
+Underfull \hbox (badness 1158) in paragraph at lines 450--451
 \OT1/ptm/m/n/10 a-bil-i-ties: $\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/
 it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) = [](\OML/cmm/m/it
 /10 ^^R\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s; \OMS/cmsy/m/n/10 ^^A\OT1/cmr/m/n/10
@@ -508,7 +516,7 @@ it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) = [](\OML/cmm/m/it
 m/m/it/10 L \OT1/cmr/m/n/10 =
  []
 
-[9] [10] [11] (main.aux)
+[10] [11] [12] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -517,32 +525,34 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: CA59FC714F008236705CF499AE4FCF3A;3386.
  ) 
 Here is how much of TeX's memory you used:
- 11035 strings out of 467871
- 168883 string characters out of 5418860
- 595434 words of memory out of 5000000
- 39663 multiletter control sequences out of 15000+600000
- 645899 words of font info for 73 fonts, out of 8000000 for 9000
+ 11065 strings out of 467871
+ 169187 string characters out of 5418860
+ 596436 words of memory out of 5000000
+ 39679 multiletter control sequences out of 15000+600000
+ 651206 words of font info for 89 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,1340b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,79p,1340b,573s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mbx10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmex10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmmi10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/f
-onts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Noah/AppData/Local/Programs/M
-iKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Noah/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Noah/AppData/Lo
-cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/Noah/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/N
-oah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:
-/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/m
-sbm10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/ut
-mb8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
-r8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr
-i8a.pfb>
-Output written on main.pdf (11 pages, 244939 bytes).
+pe1/public/amsfonts/cm/cmmi5.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Noah/AppData/Local/Programs/M
+iKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Noah/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Noah/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Noah/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/No
+ah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/U
+sers/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pf
+b><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
+mtt10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
+nts/symbols/msbm10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1
+/urw/times/utmb8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/
+urw/times/utmr8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/u
+rw/times/utmri8a.pfb>
+Output written on main.pdf (12 pages, 269976 bytes).
 PDF statistics:
- 353 PDF objects out of 1000 (max. 8388607)
- 102 named destinations out of 1000 (max. 500000)
+ 374 PDF objects out of 1000 (max. 8388607)
+ 106 named destinations out of 1000 (max. 500000)
  169 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -56,32 +56,43 @@ Self-play agents can cycle, overfit, or exhibit non-transitive behaviour~\citep{
 % ===================================================================
 \section{Problem Formulation}
 
-\paragraph{Setup.}
-Consider a two-player zero-sum game with self-play training. Player~0 (victim) learns via RL. An adversary $\mathcal{M}$ produces a mask per decision point:
-\[
-\text{mask} = \mathcal{M}(\text{info\_state}, A_{\text{legal}}, \text{player})
-\]
-returning a subset of legal actions. The victim observes only the masked action set and is unaware of the adversary.
+\paragraph{Game model.}
+Consider a two-player zero-sum extensive-form game $\Gamma$ with information sets $\mathcal{I} = \mathcal{I}_0 \cup \mathcal{I}_1$. At information set $h \in \mathcal{I}_p$, player $p$ chooses from legal actions $A(h)$. Player~0 is the \emph{victim}; Player~1 is the opponent. Both learn via self-play.
+
+\paragraph{Adversary definition.}
+An \emph{action-removal adversary} is a mapping $\mathcal{M}: \mathcal{I}_0 \to 2^A$ that, at each victim information set $h$, selects a subset $\mathcal{M}(h) \subseteq A(h)$ of actions to \emph{retain}. The victim observes only $\mathcal{M}(h)$ and is unaware of the adversary. Formally:
+
+\begin{itemize}
+\item \textbf{Input}: information set $h$, legal actions $A(h)$, current player $p$.
+\item \textbf{Output}: $\mathcal{M}(h) \subseteq A(h)$ with $|\mathcal{M}(h)| \geq 1$ (at least one action retained).
+\item \textbf{Constraint}: $|\text{supp}(\mathcal{M})| = |\{h : |\mathcal{M}(h)| < |A(h)|\}| \leq k$ (budget).
+\item \textbf{Objective}: minimise the victim's expected value $V_0(\pi^*_\mathcal{M})$.
+\end{itemize}
 
 \paragraph{Bi-level optimisation.}
+The adversary and victim interact through a bi-level problem:
 \begin{align}
-\text{Inner:} \quad & \pi^* = \arg\max_\pi \mathbb{E}\left[\sum_t r_t \mid \pi, \mathcal{M}\right] \label{eq:inner} \\
-\text{Outer:} \quad & \mathcal{M}^* = \arg\min_{\mathcal{M}} \mathbb{E}\left[\sum_t r_t \mid \pi^*, \mathcal{M}\right] \label{eq:outer}
+\text{Inner:} \quad & \pi^*_\mathcal{M} = \arg\max_\pi \mathbb{E}\left[\sum_t r_t \mid \pi, \mathcal{M}\right] \label{eq:inner} \\
+\text{Outer:} \quad & \mathcal{M}^* = \arg\min_{\mathcal{M} \in \mathcal{C}_k} V_0(\pi^*_\mathcal{M}) \label{eq:outer}
 \end{align}
-The inner loop trains the victim under the mask; the outer loop updates the adversary to minimise the victim's expected reward.
+where $\mathcal{C}_k = \{\mathcal{M} : |\text{supp}(\mathcal{M})| \leq k\}$. The inner loop trains the victim under the adversary's mask via RL; the outer loop updates the adversary via REINFORCE with reward signal $-V_0$. In practice, we alternate: 500 episodes of inner training, then one adversary gradient step, for 20--25 outer iterations.
 
-\paragraph{Budget constraint.}
-The adversary can mask at most $k$ information sets: $|\{h \in \mathcal{I}_0 : |\mathcal{M}(h)| < |A(h)|\}| \leq k$. This models realistic constraints where an attacker controls limited endpoints.
+\paragraph{Adversary implementation.}
+\emph{Tabular}: preference table $\theta(h, a)$ with $p_{\text{remove}}(a|h) = \text{softmax}(\theta(h,\cdot))$; the action with highest removal probability is removed. Updated via REINFORCE.
+\emph{Neural}: MLP $f_\phi: \mathbb{R}^d \to \Delta^{|A|+1}$ mapping state features to a distribution over $|A|$ removal choices plus ``no removal.'' Trained via REINFORCE with mean-reward baseline.
 
 \paragraph{Connection to CAC$_w$.}
-Each masked state where $|A| > 1$ is reduced to $|A| = 1$ decreases CAC by~1. The adversary's objective can be viewed as \emph{approximate minimisation of reach-weighted CAC$_w$}:
+Define \emph{reach-weighted contingent action capacity}:
 \[
-\mathcal{M}^*_k = \arg\min_{|\text{supp}(\mathcal{M})| \leq k} \text{CAC}_w(\pi_0 \mid \mathcal{M})
+\text{CAC}_w(\mathcal{M}) = \sum_{h \in \mathcal{I}_0} \rho(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]
 \]
-where $\text{CAC}_w = \sum_h \rho(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$ and $\rho(h)$ is the reach probability of information set $h$.
+where $\rho(h)$ is the reach probability of $h$ under current play. Each masked state reduces CAC$_w$. The adversary's value-minimisation objective~\eqref{eq:outer} can be decomposed: masking state $h$ reduces $V_0$ by approximately $\rho(h) \cdot \delta(h)$, where $\delta(h) = |Q(h, a^*) - Q(h, a_{\text{forced}})|$ is the \emph{value gap} at $h$. This motivates a refined measure:
+\[
+\text{CAC}_v(\mathcal{M}) = \sum_{h \in \mathcal{I}_0} \rho(h) \cdot \delta(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]
+\]
+Empirically, CAC$_v$ correlates with victim reward at $r = 0.81$ vs.\ CAC$_w$'s $r = 0.77$ (Section~\ref{sec:efficiency}).
 
 \paragraph{Deterministic Exploitation Attractor (DEA).}
-When CAC$_w = 0$, the game reduces to a single-agent MDP with deterministic transitions.
 
 \begin{proposition}[DEA Convergence]
 Under CAC$_w = 0$ in self-play Q-learning with $\varepsilon$-greedy ($\varepsilon > 0$, $\alpha \in (0,1)$):
@@ -90,7 +101,21 @@ Under CAC$_w = 0$ in self-play Q-learning with $\varepsilon$-greedy ($\varepsilo
 (iii)~$(\sigma^*, \text{BR}(\sigma^*))$ is a stable fixed point.
 \end{proposition}
 
-\emph{Proof sketch.} Forced actions make the victim's policy Q-value-independent. The opponent faces a stationary MDP; Q-learning converges under standard conditions. The pair is stable: neither player can unilaterally deviate. In Kuhn, $\text{BR}(\sigma^*_{\text{forced-pass}}) = -1.0$ per hand.
+\emph{Proof sketch.} Forced actions make the victim's policy Q-value-independent. The opponent faces a stationary MDP; Q-learning converges under standard conditions. The pair is stable: neither player can unilaterally deviate.
+
+\begin{proposition}[Damage bound]
+Let $\mathcal{M}$ mask a single information set $h^*$ by forcing action $a_f$. The victim's value loss relative to unmasked play is bounded by:
+\[
+\Delta V_0 \geq \rho(h^*) \cdot [Q_0(h^*, a^*) - Q_0(h^*, a_f)]
+\]
+where $a^* = \arg\max_a Q_0(h^*, a)$ is the victim's best action and $\rho(h^*)$ is the reach probability. For a budget-$k$ adversary, total damage is at most:
+\[
+\Delta V_0 \leq \sum_{h \in \text{supp}(\mathcal{M})} \rho(h) \cdot \max_a [Q_0(h, a^*) - Q_0(h, a)]
+\]
+The optimal greedy adversary selects the $k$ states with highest $\rho(h) \cdot \delta(h)$---exactly the states that maximise per-unit CAC$_v$ reduction.
+\end{proposition}
+
+\emph{Proof.} The bound follows from the definition of Q-values and linearity of expectation over the reach-weighted trajectory. At state $h^*$, forcing $a_f$ instead of $a^*$ loses $Q_0(h^*, a^*) - Q_0(h^*, a_f)$ in expectation, weighted by $\rho(h^*)$. The greedy selection follows from submodularity of the coverage function under independent masking.\footnote{Strict submodularity holds when masking one state does not change reach probabilities of others---approximately true when masked states are on different branches of the game tree.}
 
 % ===================================================================
 \section{Methods}
@@ -127,8 +152,7 @@ Value heuristic & Remove at states with highest $|Q|$ \\
 \end{table}
 
 \paragraph{Adversary architectures.}
-\emph{Tabular}: preference table $\theta(h, a)$ with softmax removal probabilities, updated via REINFORCE ($R = -R_{\text{victim}}$), 20 outer $\times$ 500 inner episodes.
-\emph{Neural}: 2-layer MLP (input $\to$ 32 $\to$ $|A|{+}1$, softmax), where the extra output means ``remove nothing.'' Trained via REINFORCE with mean-reward baseline, 20 outer $\times$ 500 inner, Adam ($10^{-3}$).
+Both tabular and neural adversaries are defined formally in Section~3. The neural adversary scales its architecture with game size: 2-layer (32 hidden) for Kuhn/Leduc, 3-layer (128-64) for Leduc-10/20.
 
 \paragraph{Environments.}
 \textbf{Kuhn Poker}: 3 cards, 2 actions, 6 P0 info states.
@@ -395,8 +419,8 @@ The adversary has learned Kuhn's strategic structure: it removes BET from J (pre
 % ===================================================================
 \section{Discussion}
 
-\paragraph{Scale.}
-The scaling trajectory (Table~\ref{tab:scaling}) is the paper's strongest evidence: the adversary's advantage \emph{monotonically increases} from $2.2\times$ at 50 states to $4.8\times$ at 5,531 states. Larger games have more heterogeneous strategic structure---more states where targeted removal outperforms random. The adversary's variance also decreases with scale (CI $\pm 0.47$ at 50 states $\to$ $\pm 0.23$ at 1,496), indicating more robust convergence. Neural NFSP ($2.3\times$ on Leduc-5) confirms this holds for properly neural game-solving methods, not just DQN.
+\paragraph{Scaling law.}
+The scaling trajectory (Table~\ref{tab:scaling}) is the paper's strongest evidence. Excluding Kuhn (2-action ceiling effect), log-linear regression of adversary damage ratio on $\log_{10}(|\mathcal{I}_0|)$ yields $R^2 = 0.62$ (Pearson $r = 0.79$), with slope $1.56$: each $10\times$ increase in state space increases the adversary's advantage ratio by ${\sim}1.6\times$. The absolute damage gap (adversarial minus random reward) grows from $-1.40$ at 50 states to $-2.51$ at 1,496 states. The adversary's variance \emph{decreases} with scale (CI $\pm 0.47 \to \pm 0.15$), indicating more robust convergence in larger games where there is more targetable strategic heterogeneity. Neural NFSP ($2.3\times$ on Leduc-5) confirms this holds for properly neural game-solving methods.
 
 \paragraph{CACw: necessary but not sufficient.}
 The CAC$_w$--reward correlation ($r = 0.80$) is consistent with the hypothesis that reducing strategic flexibility drives performance degradation. However, CACw is a \emph{necessary} condition for collapse, not a complete characterization: at intermediate budgets, the adversary sometimes achieves comparable or greater damage with higher CACw than random masking (Table~\ref{tab:budget}, $k{=}3$: adversarial CACw $= 0.68$ vs.\ random $0.37$, yet adversarial reward $= -0.25$ vs.\ random $-0.21$). This occurs because CACw aggregates over all reachable states; the adversary targets the \emph{strategically pivotal} subset where action removal most disrupts equilibrium play, whereas random removal may eliminate more states but at less important ones. We test a refined measure, \emph{counterfactual-value-weighted capacity} $\text{CAC}_v = \sum_h \rho(h) \cdot |Q(h,a_0) - Q(h,a_1)| \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$, which weights each state by its Q-value gap (strategic importance). CAC$_v$ achieves Pearson $r = 0.81$ vs.\ CAC$_w$'s $r = 0.77$, confirming that incorporating value sensitivity improves the structural explanation. The remaining unexplained variance likely reflects higher-order interactions (e.g., how masking one state changes the value landscape at downstream states).
