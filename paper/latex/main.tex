@@ -32,12 +32,12 @@ Multi-agent reinforcement learning (MARL) agents trained via self-play achieve s
 
 An adversary that selectively removes actions---disabling specific capabilities rather than adding noise---poses a qualitatively different threat from bounded perturbation. Such attacks arise naturally: hardware failures disable actuators, regulatory changes restrict strategies, API deprecations remove endpoints, and sandboxing constrains agent capabilities. We formalise this as a bi-level optimisation where the inner loop trains an RL agent under masked actions and the outer loop trains an adversary to choose which actions to remove.
 
-Our key finding is that adversarial masking is \emph{dramatically more efficient} than random removal: a neural adversary targeting fewer than 50\% of decision points in Leduc Poker causes $9\times$ more damage than removing a fixed action everywhere. The mechanism operates through selective minimisation of reach-weighted contingent action capacity (CAC$_w$)---empirically verified by strong correlation between CAC$_w$ and victim reward across budget levels.
+Our key finding is that adversarial masking is \emph{dramatically more efficient} than random removal: across Leduc variants, learned removal is up to $4.8\times$ more damaging than random masking at comparable support. The mechanism operates through selective minimisation of reach-weighted contingent action capacity (CAC$_w$)---empirically verified by strong correlation between CAC$_w$ and victim reward across budget levels.
 
 \paragraph{Contributions.}
 \begin{itemize}
   \item We formalise adversarial action masking and show it is $4\times$ more damaging than learned perturbation (RARL-style) with equal training budget.
-  \item We demonstrate scaling from 6 to \textbf{5,531} information states across five algorithms (QL, PPO, NFSP, neural NFSP, DQN), with the adversary's advantage \emph{monotonically increasing} from $2.2\times$ to $4.8\times$ as game complexity grows.
+  \item We demonstrate scaling from 6 to \textbf{5,531} information states across five algorithms (QL, PPO, NFSP, neural NFSP, DQN), with the adversary's advantage increasing from $2.2\times$ to $4.8\times$ within the Leduc family as game complexity grows.
   \item We validate cross-domain in two non-poker environments (competitive gridworld, resource collection), confirming the phenomenon is not poker-specific.
   \item We connect the mechanism to CAC$_w$ ($r = 0.80$) and a refined CAC$_v$ ($r = 0.81$), and show victims do not recover under extended training.
 \end{itemize}
@@ -362,7 +362,7 @@ The damage bound (Proposition~2) is local and additive, assuming independent mas
 % ===================================================================
 \section{Conclusion}
 
-We show that self-play RL agents---from tabular Q-Learning to neural NFSP and DQN, from 6-state Kuhn to 5,531-state Leduc-20, across poker and non-poker domains---are brittle to targeted action-space attacks. The adversary's advantage over random masking \emph{monotonically increases} with game complexity ($2.2\times$ at 50 states to $4.8\times$ at 5,531), persists across five algorithms and seven environments. The mechanism operates through selective reduction of strategically important decision capacity (CAC$_w$/$_v$), victims do not recover under extended training, and the attack transfers across agents. These findings argue for robustness designs that preserve strategic flexibility at high-reach decision points rather than raw action count.
+We show that self-play RL agents---from tabular Q-Learning to neural NFSP and DQN, from 6-state Kuhn to 5,531-state Leduc-20, across poker and non-poker domains---are brittle to targeted action-space attacks. Within the Leduc family, the adversary's advantage over random masking increases with game complexity ($2.2\times$ at 50 states to $4.8\times$ at 5,531), and the vulnerability persists across five algorithms and seven environments. The mechanism operates through selective reduction of strategically important decision capacity (CAC$_w$/$_v$), victims do not recover under extended training, and the attack transfers across agents. These findings argue for robustness designs that preserve strategic flexibility at high-reach decision points rather than raw action count.
 
 % ===================================================================
 \bibliographystyle{plainnat}
