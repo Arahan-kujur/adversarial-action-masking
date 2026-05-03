@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 11:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 11:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -150,6 +150,18 @@ LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
+(C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/amscls\amsthm.sty
+Package: amsthm 2020/05/29 v2.20.6
+\thm@style=\toks25
+\thm@bodyfont=\toks26
+\thm@headfont=\toks27
+\thm@notefont=\toks28
+\thm@headpunct=\toks29
+\thm@preskip=\skip58
+\thm@postskip=\skip59
+\thm@headsep=\skip60
+\dth@everypar=\toks30
+)
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
 
@@ -316,13 +328,14 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 84.
 )
-\Hy@SectionHShift=\skip58
+\Hy@SectionHShift=\skip61
 )
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/placeins\placeins.sty
 Package: placeins 2005/04/18  v 2.2
 )
+\c@proposition=\count315
 LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 1
-7.
+9.
 
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -330,28 +343,28 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdft
 ex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count315
+\l__color_backend_stack_int=\count316
 ) (main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -423,17 +436,17 @@ LaTeX Font Info:    ... okay on input line 17.
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mki
 i
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count316
+\scratchcounter=\count317
 \scratchdimen=\dimen185
 \scratchbox=\box55
-\nofMPsegments=\count317
-\nofMParguments=\count318
-\everyMPshowfont=\toks25
-\MPscratchCnt=\count319
+\nofMPsegments=\count318
+\nofMParguments=\count319
+\everyMPshowfont=\toks31
+\MPscratchCnt=\count320
 \MPscratchDim=\dimen186
-\MPnumerator=\count320
-\makeMPintoPDFobject=\count321
-\everyMPtoPDFconversion=\toks26
+\MPnumerator=\count321
+\makeMPintoPDFobject=\count322
+\everyMPtoPDFconversion=\toks32
 )
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-ba
 se.sty
@@ -445,25 +458,25 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 g
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 17.
+Package hyperref Info: Link coloring OFF on input line 19.
  (main.out) (main.out)
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 19.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 21.
 
 
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 19.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 21.
 
 
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 3
-6.
+8.
 
 (C:\Users\Noah\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
@@ -473,28 +486,48 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 
 {C:/Users/Noah/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Noah/
 AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] [2] [3]
-<figures/attack_efficiency.png, id=142, 578.16pt x 361.35pt>
+<figures/attack_efficiency.png, id=176, 578.16pt x 361.35pt>
 File: figures/attack_efficiency.png Graphic file (type png)
 <use figures/attack_efficiency.png>
-Package pdftex.def Info: figures/attack_efficiency.png  used on input line 147.
+Package pdftex.def Info: figures/attack_efficiency.png  used on input line 166.
 
 (pdftex.def)             Requested size: 317.9892pt x 198.74312pt.
- [4 <./figures/attack_efficiency.png>] [5] (main.bbl [6]) [7] (main.aux)
+ [4]
+Underfull \vbox (badness 2393) has occurred while \output is active []
+
+ [5 <./figures/attack_efficiency.png>]
+Underfull \vbox (badness 2150) has occurred while \output is active []
+
+ [6]
+[7] (main.bbl)
+Underfull \hbox (badness 1158) in paragraph at lines 329--330
+\OT1/ptm/m/n/10 a-bil-i-ties: $\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/
+it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) = [](\OML/cmm/m/it
+/10 ^^R\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s; \OMS/cmsy/m/n/10 ^^A\OT1/cmr/m/n/10
+ ))$\OT1/ptm/m/n/10 . Up-dates use the clipped sur-ro-gate ob-jec-tive $\OML/cm
+m/m/it/10 L \OT1/cmr/m/n/10 =
+ []
+
+[8]
+Underfull \vbox (badness 1237) has occurred while \output is active []
+
+ [9]
+[10] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 36516C18B494E7102364FA6F58BBB4B5;2044.
+(rerunfilecheck)             Checksum: FFA96177F56399C90FC1578FE3213C93;2925.
  ) 
 Here is how much of TeX's memory you used:
- 10866 strings out of 467871
- 166480 string characters out of 5418860
- 589570 words of memory out of 5000000
- 39544 multiletter control sequences out of 15000+600000
- 643667 words of font info for 70 fonts, out of 8000000 for 9000
+ 11013 strings out of 467871
+ 168881 string characters out of 5418860
+ 592496 words of memory out of 5000000
+ 39662 multiletter control sequences out of 15000+600000
+ 645899 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,13n,79p,994b,571s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,13n,79p,1259b,514s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mbx10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmex10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -503,16 +536,17 @@ pe1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/f
 onts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Noah/AppData/Local/Programs/M
 iKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Noah/AppData/Local/Prog
 rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Noah/AppData/Lo
-cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Noah/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/
-Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.p
-fb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pf
-b><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb
-><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb
->
-Output written on main.pdf (7 pages, 275701 bytes).
+cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/Noah/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/N
+oah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:
+/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/m
+sbm10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/ut
+mb8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utm
+r8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr
+i8a.pfb>
+Output written on main.pdf (10 pages, 307972 bytes).
 PDF statistics:
- 244 PDF objects out of 1000 (max. 8388607)
- 57 named destinations out of 1000 (max. 500000)
- 118 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 319 PDF objects out of 1000 (max. 8388607)
+ 81 named destinations out of 1000 (max. 500000)
+ 158 words of extra memory for PDF output out of 10000 (max. 10000000)
 

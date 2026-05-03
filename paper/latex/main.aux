@@ -11,44 +11,58 @@
 \citation{zhang2020adaptive}
 \citation{huang2022closer}
 \citation{altman1999constrained}
+\citation{pinto2017robust}
+\citation{tessler2019action}
+\citation{zhang2021robust,sun2022who}
 \citation{balduzzi2019open,lanctot2019openspiel}
 \citation{lanctot2017unified}
 \citation{heinrich2016deep}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Adversarial attacks on RL.}{2}{section*.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Self-play robustness.}{2}{section*.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Decision capacity in self-play.}{2}{section*.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Neural Fictitious Self-Play.}{2}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Action-robust and adversarial RL.}{2}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Self-play robustness.}{2}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Decision capacity in self-play.}{2}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Neural Fictitious Self-Play.}{2}{section*.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Problem Formulation}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Setup.}{2}{section*.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Bi-level optimisation.}{2}{section*.7}\protected@file@percent }
-\newlabel{eq:inner}{{1}{2}{Bi-level optimisation}{equation.1}{}}
-\newlabel{eq:outer}{{2}{2}{Bi-level optimisation}{equation.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{Budget constraint.}{2}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Connection to CAC.}{3}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Setup.}{2}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Bi-level optimisation.}{3}{section*.8}\protected@file@percent }
+\newlabel{eq:inner}{{1}{3}{Bi-level optimisation}{equation.1}{}}
+\newlabel{eq:outer}{{2}{3}{Bi-level optimisation}{equation.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Budget constraint.}{3}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Connection to CAC.}{3}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Deterministic Exploitation Attractor (DEA).}{3}{section*.11}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Methods}{3}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Victim agents.}{3}{section*.10}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Masking strategies evaluated.}}{3}{table.1}\protected@file@percent }
-\newlabel{tab:strategies}{{1}{3}{Masking strategies evaluated}{table.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Victim agents.}{3}{section*.12}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Masking strategies.}{3}{table.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Adversary training.}{3}{section*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Environments.}{3}{section*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{3}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Adversarial vs.\ Random Masking}{3}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta $) under masking. 3 seeds. Budget: all info states.}}{3}{table.2}\protected@file@percent }
-\newlabel{tab:main}{{2}{3}{Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta $) under masking. 3 seeds. Budget: all info states}{table.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Adversary training.}{3}{section*.14}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Masking strategies evaluated.}}{4}{table.1}\protected@file@percent }
+\newlabel{tab:strategies}{{1}{4}{Masking strategies evaluated}{table.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Environments.}{4}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{4}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Adversarial vs.\ Random Masking}{4}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta $) under masking. 5 seeds. Budget: all info states.}}{4}{table.2}\protected@file@percent }
+\newlabel{tab:main}{{2}{4}{Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta $) under masking. 5 seeds. Budget: all info states}{table.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Attack Efficiency: The Core Result}{4}{subsection.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref {tab:main}, Leduc rows).}}{4}{figure.1}\protected@file@percent }
-\newlabel{fig:efficiency}{{1}{4}{Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref {tab:main}, Leduc rows)}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Self-Play Amplification}{4}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Attack Generalization}{4}{subsection.5.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref {tab:main}, Leduc rows).}}{5}{figure.1}\protected@file@percent }
+\newlabel{fig:efficiency}{{1}{5}{Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref {tab:main}, Leduc rows)}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Self-Play Amplification}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Attack Generalization}{5}{subsection.5.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Ablation: Learned vs.\ Heuristic Adversaries}{5}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Targeting Analysis}{5}{subsection.5.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence.}}{5}{table.3}\protected@file@percent }
-\newlabel{tab:targeting}{{3}{5}{Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence}{table.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{5}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Connection to decision capacity.}{5}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Co-adaptation as amplifier.}{5}{section*.15}\protected@file@percent }
+\citation{pinto2017robust}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Budget sweep: victim reward under learned, value heuristic, and random masking (Kuhn, 10 seeds, 95\% CIs).}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:budget}{{3}{6}{Budget sweep: victim reward under learned, value heuristic, and random masking (Kuhn, 10 seeds, 95\% CIs)}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Targeting Analysis}{6}{subsection.5.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence.}}{6}{table.4}\protected@file@percent }
+\newlabel{tab:targeting}{{4}{6}{Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Action Removal vs.\ Action Perturbation (RARL)}{6}{subsection.5.7}\protected@file@percent }
+\citation{heinrich2016deep}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{7}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Connection to decision capacity.}{7}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Co-adaptation as amplifier.}{7}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Structural vs.\ agent-specific attacks.}{7}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Algorithm-invariant vulnerability.}{7}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Implications for deployment.}{7}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{7}{section.7}\protected@file@percent }
 \bibstyle{plainnat}
 \bibdata{references}
 \bibcite{altman1999constrained}{{1}{1999}{{Altman}}{{}}}
@@ -60,10 +74,26 @@
 \bibcite{huang2022closer}{{7}{2022}{{Huang and Onta{\~n}{\'o}n}}{{}}}
 \bibcite{lanctot2017unified}{{8}{2017}{{Lanctot et~al.}}{{Lanctot, Zambaldi, Gruslys, Lazaridou, Tuyls, P{\'e}rolat, Silver, and Graepel}}}
 \bibcite{lanctot2019openspiel}{{9}{2019}{{Lanctot et~al.}}{{Lanctot, Lockhart, Lespiau, Zambaldi, et~al.}}}
-\bibcite{silver2018general}{{10}{2018}{{Silver et~al.}}{{Silver, Hubert, Schrittwieser, et~al.}}}
-\bibcite{zhang2020adaptive}{{11}{2020}{{Zhang et~al.}}{{Zhang, Ma, Singla, and Zhu}}}
-\@writefile{toc}{\contentsline {paragraph}{Structural vs.\ agent-specific attacks.}{6}{section*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Implications for deployment.}{6}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{6}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{6}{section.8}\protected@file@percent }
-\gdef \@abspage@last{7}
+\bibcite{pinto2017robust}{{10}{2017}{{Pinto et~al.}}{{Pinto, Davidson, Sukthankar, and Gupta}}}
+\bibcite{silver2018general}{{11}{2018}{{Silver et~al.}}{{Silver, Hubert, Schrittwieser, et~al.}}}
+\bibcite{sun2022who}{{12}{2022}{{Sun et~al.}}{{Sun, Zheng, Liang, and Huang}}}
+\bibcite{tessler2019action}{{13}{2019}{{Tessler et~al.}}{{Tessler, Efroni, and Mannor}}}
+\bibcite{zhang2021robust}{{14}{2021}{{Zhang et~al.}}{{Zhang, Chen, Boning, and Hsieh}}}
+\bibcite{zhang2020adaptive}{{15}{2020}{{Zhang et~al.}}{{Zhang, Ma, Singla, and Zhu}}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{8}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Tabular PPO Details}{9}{appendix.A}\protected@file@percent }
+\newlabel{app:ppo}{{A}{9}{Tabular PPO Details}{appendix.A}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Experimental Protocols}{9}{appendix.B}\protected@file@percent }
+\newlabel{app:protocols}{{B}{9}{Experimental Protocols}{appendix.B}{}}
+\@writefile{toc}{\contentsline {paragraph}{Self-play amplification.}{9}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Transfer experiment.}{9}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Budget enforcement.}{9}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C}Hyperparameters}{9}{appendix.C}\protected@file@percent }
+\newlabel{app:hyperparams}{{C}{9}{Hyperparameters}{appendix.C}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Q-Learning hyperparameters.}}{9}{table.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces PPO hyperparameters.}}{9}{table.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Adversary hyperparameters.}}{10}{table.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {D}Normalisation Details}{10}{appendix.D}\protected@file@percent }
+\newlabel{app:normalisation}{{D}{10}{Normalisation Details}{appendix.D}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Normalisation bounds per game.}}{10}{table.8}\protected@file@percent }
+\gdef \@abspage@last{10}
