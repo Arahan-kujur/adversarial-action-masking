@@ -1,4 +1,4 @@
-\begin{thebibliography}{25}
+\begin{thebibliography}{27}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -17,6 +17,12 @@ David Balduzzi, Marta Garnelo, Yoram Bachrach, Wojciech Czarnecki, Julien
 \newblock Open-ended learning in symmetric zero-sum games.
 \newblock In \emph{International Conference on Machine Learning}, pages
   434--443, 2019.
+
+\bibitem[Blanke et~al.(2006)Blanke, Kinnaert, Lunze, and
+  Staroswiecki]{blanke2006fault}
+Mogens Blanke, Michel Kinnaert, Jan Lunze, and Marcel Staroswiecki.
+\newblock \emph{Diagnosis and fault-tolerant control}.
+\newblock Springer, 2006.
 
 \bibitem[Boutilier et~al.(1999)Boutilier, Dean, and
   Hanks]{boutilier1999decision}
@@ -72,6 +78,13 @@ Garud~N. Iyengar.
 \newblock Robust dynamic programming.
 \newblock \emph{Mathematics of Operations Research}, 30\penalty0 (2):\penalty0
   257--280, 2005.
+
+\bibitem[Klyubin et~al.(2005)Klyubin, Polani, and
+  Nehaniv]{klyubin2005empowerment}
+Alexander~S. Klyubin, Daniel Polani, and Chrystopher~L. Nehaniv.
+\newblock Empowerment: A universal agent-centric measure of control.
+\newblock In \emph{IEEE Congress on Evolutionary Computation}, pages 128--135,
+  2005.
 
 \bibitem[Lanctot et~al.(2017)Lanctot, Zambaldi, Gruslys, Lazaridou, Tuyls,
   P{\'e}rolat, Silver, and Graepel]{lanctot2017unified}

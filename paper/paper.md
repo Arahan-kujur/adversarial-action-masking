@@ -46,7 +46,7 @@ Victims do not recover under continued masked training. In Leduc, evaluation-onl
 | No mask | `+0.05 +/- 0.03` |
 | Evaluation-only mask | `-0.58 +/- 0.18` |
 | Continued masked training | `-2.65 +/- 0.30` |
-| Mask-aware training from scratch | `-2.71 +/- 0.26` |
+| Fixed-mask retraining from scratch | `-2.71 +/- 0.26` |
 
 ![No recovery](latex/figures/learning_curve_no_recovery.png)
 

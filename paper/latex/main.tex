@@ -52,10 +52,10 @@ Adversarial attacks on RL most commonly perturb observations~\citep{huang2017adv
 Robust MDPs~\citep{iyengar2005robust,nilim2005robust} and constrained MDPs~\citep{altman1999constrained} model uncertainty or constraints in the environment. Robust Adversarial RL (RARL)~\citep{pinto2017robust} and action-robust RL~\citep{tessler2019action} train against perturbations of the action actually executed. Those channels modify selected actions; our adversary removes actions from the legal set before selection. This difference matters: bounded perturbations preserve the agent's ability to choose, whereas removal can collapse a decision point to a singleton action set.
 
 \paragraph{Robust MARL defenses.}
-Recent robust MARL methods train agents against structured adversaries, including game-theoretic robust training for temporally coupled perturbations (GRAD)~\citep{liang2024grad} and fault-switching MARL defenses such as MARTA~\citep{mguni2025marta}. These approaches are complementary: they improve robustness to perturbations, malfunctions, or adversarial agents within an intact joint action space. Our attack changes the feasible action set itself. A mask-aware version of such defenses is a natural direction, but existing guarantees do not directly cover state-dependent removal of legal actions.
+Recent robust MARL methods train agents against structured adversaries, including game-theoretic robust training for temporally coupled perturbations (GRAD)~\citep{liang2024grad} and fault-switching MARL defenses such as MARTA~\citep{mguni2025marta}. Fault-tolerant control has long studied actuator failures and reconfiguration~\citep{blanke2006fault}; our setting can be viewed as a learning-based analogue where failures are state-dependent and adversarially selected. These approaches are complementary: they improve robustness to perturbations, malfunctions, or adversarial agents within an intact joint action space. Our attack changes the feasible action set itself. A mask-aware version of such defenses is a natural direction, but existing guarantees do not directly cover state-dependent removal of legal actions.
 
 \paragraph{Action sets and masking.}
-Invalid action masking prevents agents from selecting impossible moves~\citep{huang2022closer}. Decision-theoretic planning has long studied structural leverage and action contingencies~\citep{boutilier1999decision}, but typically not adversarially selected action availability during learning. Our work reverses the usual masking motivation: the mask is not a safety or efficiency aid, but an attacker-chosen capability removal.
+Invalid action masking prevents agents from selecting impossible moves~\citep{huang2022closer}. Decision-theoretic planning has long studied structural leverage and action contingencies~\citep{boutilier1999decision}, and empowerment measures quantify an agent's available control over future outcomes~\citep{klyubin2005empowerment}. Our CAC view is related in spirit but is game-local and adversarial: it measures remaining multi-action decision capacity at reached information states. Our work reverses the usual masking motivation: the mask is not a safety or efficiency aid, but an attacker-chosen capability removal.
 
 \paragraph{Self-play and imperfect-information games.}
 Self-play can overfit, cycle, or exploit non-transitive structure~\citep{balduzzi2019open,lanctot2019openspiel}. Regret-minimization methods such as CFR~\citep{zinkevich2007regret} and Deep CFR~\citep{brown2019deep} provide strong baselines for imperfect-information games, while NFSP~\citep{heinrich2016deep} combines best-response learning with average-strategy tracking. Population methods such as PSRO~\citep{lanctot2017unified} maintain diversity. We show that these algorithmic stabilizers do not address a different failure mode: when the action set itself is structurally reduced, averaging and population diversity cannot restore eliminated strategic dimensions.
@@ -93,7 +93,7 @@ Define \emph{reach-weighted contingent action capacity}:
 \[
 \text{CAC}_w(\mathcal{M}) = \sum_{h \in \mathcal{I}_0} \rho(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]
 \]
-where $\rho(h)$ is the reach probability of $h$ under current play. Each masked state reduces CAC$_w$. The adversary's value-minimisation objective~\eqref{eq:outer} can be decomposed: masking state $h$ reduces $V_0$ by approximately $\rho(h) \cdot \delta(h)$, where $\delta(h) = |Q(h, a^*) - Q(h, a_{\text{forced}})|$ is the \emph{value gap} at $h$. This motivates a refined measure:
+where $\rho(h)$ is the reach probability of $h$ under current play. CAC$_w$ measures \emph{remaining} multi-action capacity: an unmasked decision state with at least two retained actions contributes positive capacity, while a state collapsed to a singleton contributes zero. Stronger attacks therefore drive CAC$_w$ downward by turning high-reach decision points into forced moves. The adversary's value-minimisation objective~\eqref{eq:outer} can be decomposed: masking state $h$ reduces $V_0$ by approximately $\rho(h) \cdot \delta(h)$, where $\delta(h) = |Q(h, a^*) - Q(h, a_{\text{forced}})|$ is the \emph{value gap} at $h$. This motivates a refined measure:
 \[
 \text{CAC}_v(\mathcal{M}) = \sum_{h \in \mathcal{I}_0} \rho(h) \cdot \delta(h) \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]
 \]
@@ -300,7 +300,7 @@ Two non-poker domains with different structures (goal-seeking vs.\ resource comp
 \paragraph{Budget sweep.}
 Appendix~\ref{app:ablations} shows victim reward as a function of adversary budget $k$ (number of info states masked). Targeted removal degrades the victim as support grows; random masking requires broad coverage to approach the same damage.
 
-\paragraph{CACw$_w$ correlation.}
+\paragraph{CAC$_w$ correlation.}
 To verify that the adversary operates through CAC$_w$ minimisation, we compute reach-weighted CAC$_w$ at each budget level and correlate with victim reward. Across all budget levels and both adversarial and random conditions (10 seeds each), the Pearson correlation between CAC$_w$ and reward is $r = 0.77$ ($p < 0.001$); for adversarial-only conditions, $r = 0.80$. The full budget table is in Appendix~\ref{app:ablations}.
 
 \paragraph{CACv-greedy oracle.}
@@ -334,7 +334,7 @@ In the learned perturbation baseline, the adversary observes the same informatio
 
 % -------------------------------------------------------------------
 \subsection{Additional Ablations}
-The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Evaluation-only masking already degrades a normally trained Leduc victim ($-0.58$), while continued and mask-aware training converge to larger losses ($-2.65$ and $-2.71$), showing both immediate structural harm and long-run adaptation failure. Simple action-dropout helps modestly ($-1.82$ vs.\ $-2.45$), but a persistent random mask-ensemble defense does not help ($-2.64$). This negative result is informative: robustness to arbitrary stochastic unavailability is not enough; effective defenses likely need targeted protection or redundancy at high-CACv states. Full ablation tables are in Appendix~\ref{app:ablations}.
+The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Evaluation-only masking already degrades a normally trained Leduc victim ($-0.58$), while continued masked training and retraining from scratch on the fixed final learned mask converge to larger losses ($-2.65$ and $-2.71$), showing both immediate structural harm and long-run adaptation failure. Simple action-dropout helps modestly ($-1.82$ vs.\ $-2.45$), but a persistent random mask-ensemble defense does not help ($-2.64$). This negative result is informative: robustness to arbitrary stochastic unavailability is not enough; effective defenses likely need targeted protection or redundancy at high-CACv states. Full ablation tables are in Appendix~\ref{app:ablations}.
 
 % ===================================================================
 \section{Discussion}
@@ -518,7 +518,7 @@ Training/evaluation protocol & Victim reward \\
 No mask & $+0.05 \pm 0.03$ \\
 Evaluation-only mask & $-0.58 \pm 0.18$ \\
 Continued training under mask & $-2.65 \pm 0.30$ \\
-Mask-aware training from scratch & $-2.71 \pm 0.26$ \\
+Fixed-mask retraining from scratch & $-2.71 \pm 0.26$ \\
 \bottomrule
 \end{tabular}
 \end{table}
