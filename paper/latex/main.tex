@@ -21,7 +21,7 @@
 
 % ===================================================================
 \begin{abstract}
-We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. In Kuhn and Leduc Poker, across tabular Q-Learning, PPO, NFSP, and neural DQN victims, we show that: (i)~adversarial masking causes up to $9\times$ more damage than random masking at the same budget, and $11\times$ more than RARL-style action perturbation; (ii)~the adversary learns to minimise reach-weighted contingent action capacity (CAC$_w$), empirically confirmed by a Pearson correlation of $r = 0.80$ between CAC$_w$ and victim reward; (iii)~self-play co-adaptation amplifies the attack; and (iv)~the learned mask transfers across agents, indicating structural vulnerability. Critically, a neural adversary (MLP with REINFORCE) against a DQN victim in Leduc Poker achieves $-2.57$ reward per hand ($2.2\times$ worse than random masking)---demonstrating the phenomenon scales beyond tabular settings to function-approximation agents in games with $\sim$50 information sets.
+We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. In Kuhn and Leduc Poker, across tabular Q-Learning, PPO, NFSP, and neural DQN victims, we show that: (i)~adversarial masking causes up to $9\times$ more damage than random masking at the same budget, and $11\times$ more than RARL-style action perturbation; (ii)~the adversary learns to minimise reach-weighted contingent action capacity (CAC$_w$), empirically confirmed by a Pearson correlation of $r = 0.80$ between CAC$_w$ and victim reward; (iii)~self-play co-adaptation amplifies the attack; and (iv)~the learned mask transfers across agents, indicating structural vulnerability. Critically, in Leduc-5 Poker (389 information states), a neural adversary against a DQN victim achieves $-2.74$ reward per hand ($4.6\times$ worse than random masking), demonstrating the phenomenon scales to function-approximation agents in games an order of magnitude larger than standard benchmarks.
 \end{abstract}
 
 % ===================================================================
@@ -36,7 +36,7 @@ Our key finding is that adversarial masking is \emph{dramatically more efficient
 \paragraph{Contributions.}
 \begin{itemize}
   \item We formalise the adversarial action masking problem and show it is fundamentally more severe than action perturbation ($11\times$ more damaging than RARL).
-  \item We demonstrate the attack scales from tabular (Q-Learning, PPO, NFSP) to neural (DQN) agents across games of increasing complexity (Kuhn: 6 states; Leduc: $\sim$50 states).
+  \item We demonstrate the attack scales from tabular (Q-Learning, PPO, NFSP) to neural (DQN) agents across games of increasing complexity (Kuhn: 6 states; Leduc: $\sim$50; Leduc-5: 389 states).
   \item We provide empirical evidence that the adversary minimises CAC$_w$ (Pearson $r = 0.80$), connecting the attack to game-theoretic structure.
   \item We show the attack transfers across agents and is amplified by self-play co-adaptation.
 \end{itemize}
@@ -74,7 +74,7 @@ The inner loop trains the victim under the mask; the outer loop updates the adve
 The adversary can mask at most $k$ information sets: $|\{h \in \mathcal{I}_0 : |\mathcal{M}(h)| < |A(h)|\}| \leq k$. This models realistic constraints where an attacker controls limited endpoints.
 
 \paragraph{Connection to CAC$_w$.}
-Each masked state where $|A| > 1$ is reduced to $|A| = 1$ decreases CAC by~1. The adversary's objective is equivalent to \emph{greedy minimisation of reach-weighted CAC$_w$}:
+Each masked state where $|A| > 1$ is reduced to $|A| = 1$ decreases CAC by~1. The adversary's objective can be viewed as \emph{approximate minimisation of reach-weighted CAC$_w$}:
 \[
 \mathcal{M}^*_k = \arg\min_{|\text{supp}(\mathcal{M})| \leq k} \text{CAC}_w(\pi_0 \mid \mathcal{M})
 \]
@@ -132,8 +132,8 @@ Value heuristic & Remove at states with highest $|Q|$ \\
 
 \paragraph{Environments.}
 \textbf{Kuhn Poker}: 3 cards, 2 actions, 6 P0 info states.
-\textbf{Leduc Poker}: 6 cards, 3 actions, 2 betting rounds, $\sim$50 P0 info states.
-Both implemented from scratch with a \texttt{MaskedEnv} wrapper.
+\textbf{Leduc Poker}: 6 cards (3 ranks $\times$ 2 suits), 3 actions, 2 rounds, $\sim$50 P0 info states.
+\textbf{Leduc-5 Poker}: 10 cards (5 ranks $\times$ 2 suits), 3 actions, 2 rounds, \textbf{389 P0 info states}. All implemented from scratch with a \texttt{MaskedEnv} wrapper.
 
 % ===================================================================
 \section{Experiments}
@@ -168,6 +168,27 @@ The effect is amplified by Leduc's richer action space (3 actions vs.\ Kuhn's 2)
 
 \paragraph{Budget fairness.}
 A natural concern is whether the adversary simply masks more states than the baselines. We measure effective $L_0$ support (number of information sets where an action is actually removed) across 5000 evaluation episodes. In Leduc: adversary $L_0 \approx 45$, Random($p{=}0.5$) $\approx 47$, Fixed (raise) $\approx 38$. The adversary and random mask \emph{comparable numbers of states}---the adversary's advantage is \emph{which} states it targets, not how many.
+
+\paragraph{Scaling to Leduc-5 (389 info states).}
+To test scale, we implement Leduc-5 (5 ranks $\times$ 2 suits = 10 cards, 3 actions, 2 rounds, \textbf{389 P0 info states}---$7\times$ larger than standard Leduc). The adversary MLP is expanded to 3 layers (input $\to$ 64 $\to$ 32 $\to$ 4).
+
+\begin{table}[ht]
+\centering
+\caption{DQN victim in \textbf{Leduc-5} (389 info states) under masking (5 seeds). $r_{\min}{=}{-}17$, $r_{\max}{=}{+}17$.}
+\label{tab:leduc5}
+\begin{tabular}{lcc}
+\toprule
+Strategy & Raw Reward & Normalised \\
+\midrule
+None & $-0.15 \pm 0.11$ & $.495$ \\
+Random ($p{=}0.5$) & $-0.60 \pm 0.21$ & $.482$ \\
+Fixed (raise) & $+0.12 \pm 0.18$ & $.503$ \\
+Neural adversary & $\mathbf{-2.74 \pm 0.23}$ & $\mathbf{.420}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The neural adversary remains $4.6\times$ more damaging than random masking even at $7\times$ the state-space size, with \emph{lower variance} than at smaller scales (CI $\pm 0.23$). The adversary's advantage does not diminish with scale---it finds targetable structure in the larger game just as effectively.
 
 \paragraph{DQN masking mechanics.}
 Masked actions are filtered from the legal action list \emph{before} $\varepsilon$-greedy selection: the DQN computes Q-values for all actions, then restricts argmax and exploration to the masked subset. The victim is unaware of the masking. Total DQN training: 20k pre-training episodes (no mask) + 20 outer $\times$ 500 inner = 10k episodes under the mask. Learning curves (Appendix~\ref{app:curves}) confirm convergence: reward stabilises by episode $\sim$8k under the mask.
@@ -318,10 +339,10 @@ The adversary has learned Kuhn's strategic structure: it removes BET from J (pre
 \section{Discussion}
 
 \paragraph{Scale.}
-The DQN + neural adversary result (Section~\ref{sec:neural}) demonstrates that adversarial action removal is not a tabular artifact. The attack mechanism---CAC$_w$ minimisation---is game-size-independent: it requires targeting high-reach decision points, which a neural adversary can learn via policy gradient regardless of state-space size. The key scaling dimension is action-space richness: in Leduc (3 actions), the adversary's advantage over random is $9\times$; in Kuhn (2 actions) it converges to fixed removal.
+The Leduc-5 result (Table~\ref{tab:leduc5}) demonstrates adversarial action removal at a state-space $7\times$ larger than standard Leduc and $65\times$ larger than Kuhn. The adversary's advantage ($4.6\times$ over random) does not diminish with scale, and its variance \emph{decreases} (CI $\pm 0.23$ at 389 states vs.\ $\pm 0.47$ at $\sim$50 states), suggesting more robust convergence in larger games where there is more targetable structure. The attack mechanism---selective CAC$_w$ reduction---does not depend on tabular representations: the adversary needs only to identify high-reach decision points, which a neural policy gradient can learn as game size grows.
 
 \paragraph{CACw: necessary but not sufficient.}
-The CAC$_w$--reward correlation ($r = 0.80$) confirms that reducing strategic flexibility causally degrades performance. However, CACw is a \emph{necessary} condition for collapse, not a complete characterization: at intermediate budgets, the adversary sometimes achieves comparable or greater damage with higher CACw than random masking (Table~\ref{tab:budget}, $k{=}3$: adversarial CACw $= 0.68$ vs.\ random $0.37$, yet adversarial reward $= -0.25$ vs.\ random $-0.21$). This occurs because CACw aggregates over all reachable states; the adversary targets the \emph{strategically pivotal} subset where action removal most disrupts equilibrium play, whereas random removal may eliminate more states but at less important ones. A refined measure incorporating counterfactual value sensitivity---not just reach probability---would likely explain the remaining variance.
+The CAC$_w$--reward correlation ($r = 0.80$) is consistent with the hypothesis that reducing strategic flexibility drives performance degradation. However, CACw is a \emph{necessary} condition for collapse, not a complete characterization: at intermediate budgets, the adversary sometimes achieves comparable or greater damage with higher CACw than random masking (Table~\ref{tab:budget}, $k{=}3$: adversarial CACw $= 0.68$ vs.\ random $0.37$, yet adversarial reward $= -0.25$ vs.\ random $-0.21$). This occurs because CACw aggregates over all reachable states; the adversary targets the \emph{strategically pivotal} subset where action removal most disrupts equilibrium play, whereas random removal may eliminate more states but at less important ones. We test a refined measure, \emph{counterfactual-value-weighted capacity} $\text{CAC}_v = \sum_h \rho(h) \cdot |Q(h,a_0) - Q(h,a_1)| \cdot \mathbf{1}[|\mathcal{M}(h)| > 1]$, which weights each state by its Q-value gap (strategic importance). CAC$_v$ achieves Pearson $r = 0.81$ vs.\ CAC$_w$'s $r = 0.77$, confirming that incorporating value sensitivity improves the structural explanation. The remaining unexplained variance likely reflects higher-order interactions (e.g., how masking one state changes the value landscape at downstream states).
 
 \paragraph{Implications for deployment.}
 Real-world multi-agent systems where an adversary can disable specific capabilities (API endpoints, actuators, communication channels) are vulnerable to targeted collapse. Defences should maintain strategic flexibility at high-reach decision points. Population-based training offers partial mitigation but cannot restore eliminated strategic dimensions.
@@ -329,7 +350,7 @@ Real-world multi-agent systems where an adversary can disable specific capabilit
 % ===================================================================
 \section{Limitations}
 
-Our largest game (Leduc) has $\sim$50 information sets. While the CAC$_w$ mechanism is size-independent, verifying adversary efficiency at the scale of large poker variants ($10^5$+ states) or continuous-action domains remains open. The neural adversary uses a simple MLP; attention-based architectures selecting which states to target may find stronger attacks. We evaluate only zero-sum settings; cooperative games may exhibit different vulnerability patterns.
+Our largest game (Leduc-5) has $\sim$390 information sets---an order of magnitude larger than standard Leduc but still small compared to real-world poker ($10^5$+ states). The attack's effectiveness at this scale suggests the mechanism generalises, but verification in continuous-action or cooperative domains remains open. The neural adversary uses a simple MLP; attention-based architectures may find stronger attacks.
 
 % ===================================================================
 \section{Conclusion}
@@ -357,7 +378,7 @@ Both victim and opponent are the same agent; the mask is applied to Player~0's a
 The adversary is trained against one victim (seed~42) for 20 outer $\times$ 500 inner episodes. This mask is applied without modification to fresh victims (seeds 123--2048), each pre-trained 10k episodes then trained 10k under the transferred mask.
 
 \paragraph{Budget enforcement.}
-Budget $k$ is enforced via top-$k$ projection: the adversary trains over all states but at execution only the top-$k$ by confidence (max softmax prob.\ minus uniform baseline) have masks applied. Equivalent to a hard $L_0$ constraint on mask support.
+Budget $k$ is enforced via top-$k$ projection: the adversary trains over all states but at execution only the top-$k$ by confidence (max softmax prob.\ minus uniform baseline) have masks applied. This approximates a hard $L_0$ constraint on mask support.
 
 \section{Hyperparameters}
 \label{app:hyperparams}

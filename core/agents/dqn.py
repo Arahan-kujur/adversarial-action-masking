@@ -61,15 +61,54 @@ def _leduc_encoder(info_state: str) -> np.ndarray:
     return vec
 
 
+def _leduc_n_encoder(num_ranks):
+    """Create encoder for Leduc-N (parameterised by rank count).
+
+    Layout: card one-hot(N) + community one-hot(N) + community_present(1)
+            + history one-hot(3 actions * 10 positions = 30).
+    Dim = 2*N + 1 + 30.
+    """
+    dim = 2 * num_ranks + 1 + 30
+
+    def encoder(info_state: str) -> np.ndarray:
+        vec = np.zeros(dim, dtype=np.float32)
+        parts = info_state.split("|")
+        card_idx = int(parts[0])
+        vec[card_idx] = 1.0
+
+        if len(parts) >= 3:
+            comm = parts[1]
+            if comm != "_":
+                vec[num_ranks + int(comm)] = 1.0
+                vec[2 * num_ranks] = 1.0
+            history = parts[2]
+        elif len(parts) == 2:
+            history = parts[1]
+        else:
+            history = ""
+
+        offset = 2 * num_ranks + 1
+        for i, ch in enumerate(history):
+            if i >= 10:
+                break
+            action_idx = {"f": 0, "c": 1, "r": 2}.get(ch, 0)
+            vec[offset + i * 3 + action_idx] = 1.0
+        return vec
+
+    return encoder, dim
+
+
 def get_encoder(game: str):
     """Factory returning (encoder_fn, input_dim) for a game name.
 
-    Supported games: ``"kuhn"``, ``"leduc"``.
+    Supported games: ``"kuhn"``, ``"leduc"``, ``"leduc5"``.
     """
     if game == "kuhn":
         return _kuhn_encoder, 11
     if game == "leduc":
         return _leduc_encoder, 37
+    if game == "leduc5":
+        return _leduc_n_encoder(5)
     raise ValueError(f"Unknown game: {game}")
 
 
