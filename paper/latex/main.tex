@@ -312,6 +312,9 @@ To verify that the adversary operates through CAC$_w$ minimisation, we compute r
 \paragraph{CACv-greedy oracle.}
 We also test a direct oracle heuristic that selects the top-$k$ Kuhn states by estimated $\rho(h)\delta(h)$ and removes the victim's estimated best action. At $k=3$, CACv-greedy reaches $-0.29 \pm 0.09$, stronger than random ($-0.19 \pm 0.06$) and the learned adversary under the same short training budget ($-0.22 \pm 0.02$). This supports CACv as a mechanistic proxy: when given the value-gap statistic directly, greedy targeting produces the expected harm.
 
+\paragraph{Estimating CACv.}
+We estimate $\rho(h)$ from on-policy visitation frequencies during evaluation rollouts and $\delta(h)$ from the victim's learned Q-table or network Q-values at the same checkpoint. Thus CACv is a diagnostic proxy, not an oracle ground truth: Q-estimation error can perturb rankings. Across seeds, the top CACv states in Kuhn repeatedly include the same high-impact information sets (\texttt{0pb}, \texttt{1}, \texttt{2pb}), and the CACv-greedy ablation remains stronger than random, suggesting the ranking is stable enough for mechanistic interpretation.
+
 % -------------------------------------------------------------------
 \subsection{Action Removal vs.\ Perturbation (RARL)}
 
@@ -332,9 +335,12 @@ Learned removal & $\mathbf{-1.01 \pm 0.09}$ & $\mathbf{.248}$ \\
 
 Both adversaries use identical training (REINFORCE, same budget, same iterations), ensuring a fair comparison. The learned perturbation adversary ($-0.24$) is stronger than fixed-$p$ RARL ($-0.09$, not shown), but learned removal ($-1.01$) remains $4\times$ more damaging. The mechanism is qualitatively different: perturbation adds noise to execution but preserves the agent's \emph{ability to choose}; removal eliminates decision points entirely, reducing CAC$_w$~\citep{pinto2017robust,tessler2019action}.
 
+\paragraph{Perturbation protocol.}
+In the learned perturbation baseline, the adversary observes the same information state and replaces the victim's chosen action with another legal action (or no-op) before execution. The victim is unaware of the replacement and receives the same training/evaluation schedule as in the removal experiment. This matches training budget and observability while preserving the legal action set.
+
 % -------------------------------------------------------------------
 \subsection{Additional Ablations}
-The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Evaluation-only masking already degrades a normally trained Leduc victim ($-0.58$), while continued and mask-aware training converge to larger losses ($-2.65$ and $-2.71$), showing both immediate structural harm and long-run adaptation failure. Random action-dropout training provides only modest defense ($-2.05$ vs.\ $-2.30$ under attack). Full ablation tables are in Appendix~\ref{app:ablations}.
+The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Evaluation-only masking already degrades a normally trained Leduc victim ($-0.58$), while continued and mask-aware training converge to larger losses ($-2.65$ and $-2.71$), showing both immediate structural harm and long-run adaptation failure. Simple action-dropout helps modestly ($-1.82$ vs.\ $-2.45$), but a persistent random mask-ensemble defense does not help ($-2.64$), suggesting defenses must be targeted to high-CACv states rather than random unavailability. Full ablation tables are in Appendix~\ref{app:ablations}.
 
 % ===================================================================
 \section{Discussion}
@@ -391,6 +397,9 @@ The adversary is trained against one victim (seed~42) for 20 outer $\times$ 500 
 
 \paragraph{Budget enforcement.}
 Budget $k$ is enforced via top-$k$ projection: the adversary trains over all states but at execution only the top-$k$ by confidence (max softmax prob.\ minus uniform baseline) have masks applied. This approximates a hard $L_0$ constraint on mask support.
+
+\paragraph{Action-removal granularity.}
+Unless otherwise stated, a masked state removes exactly one legal action; neural adversaries output one removal choice or a no-op. Masks never remove all actions: if removing the selected action would leave an empty set, the original legal set is retained. In two-action games, removing one action naturally forces a singleton; in three- or five-action games, most masks leave multiple alternatives.
 
 \section{Hyperparameters}
 \label{app:hyperparams}
@@ -587,8 +596,24 @@ Public adversary & 55.0 & 70.6 & 0.794 \\
 Ablation & Setting & Victim reward \\
 \midrule
 Separate DQN networks & Leduc + adversary & $-1.53 \pm 0.48$ \\
-Action-dropout defense & Standard training & $-2.30 \pm 0.39$ \\
-Action-dropout defense & Dropout-trained & $-2.05 \pm 0.53$ \\
+Defense & Standard training & $-2.45 \pm 0.60$ \\
+Defense & Stochastic dropout & $-1.82 \pm 0.31$ \\
+Defense & Random mask ensemble & $-2.64 \pm 0.54$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Representative compute and sample costs. Wall-clock times are CPU runs on a desktop workstation.}
+\begin{tabular}{lccc}
+\toprule
+Experiment & Seeds & Episodes per seed & Wall-clock \\
+\midrule
+Leduc DQN scale & 5 & 20k pre + 10k attack & $\sim$20 min \\
+Leduc-20 DQN scale & 5 & 30k pre + 12.5k attack & $\sim$17 min \\
+Reviewer ablations & 5--10 & 6k--24k & $\sim$5 min \\
+Figure generation & n/a & none & $<$1 min \\
 \bottomrule
 \end{tabular}
 \end{table}

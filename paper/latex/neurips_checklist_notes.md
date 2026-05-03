@@ -36,11 +36,13 @@ the official NeurIPS checklist.
 - Strict matched-L0 control is in `experiments/matched_l0_control.py`.
 - Evaluation-only and mask-aware victim controls are in
   `experiments/mask_timing_controls.py`.
+- Mask-ensemble defense is in `experiments/mask_ensemble_defense.py`.
 
 ## Compute
 
 - Experiments run on CPU with PyTorch for DQN/neural NFSP/adversary MLPs.
 - No large GPU cluster is required.
+- Appendix includes a representative compute/sample cost table.
 
 ## Data
 
