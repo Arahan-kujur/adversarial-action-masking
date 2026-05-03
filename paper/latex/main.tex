@@ -208,6 +208,9 @@ Leduc-20 & \textbf{5,531} & $-0.09$ & $-0.63$ & $\mathbf{-3.00 \pm 0.15}$ & $\ma
 
 At 5,531 states the neural adversary drives DQN to $-3.00$ per hand---$4.8\times$ worse than random---with the tightest CIs of any scale ($\pm 0.15$). The adversary and random masks have comparable effective $L_0$ support (Appendix~\ref{app:protocols}); the difference is \emph{which} states are targeted.
 
+\paragraph{Threat-model ablation.}
+The main poker adversary observes the victim information state. To test whether private-card access is essential, we restrict the adversary to public information only (betting history and public card, private rank hidden). In Leduc, public-info adversarial masking still reaches $-1.71 \pm 0.58$, substantially worse than random masking ($-0.98 \pm 0.08$), though weaker than private-info masking ($-2.30 \pm 0.39$). Thus private information strengthens the attack but is not required.
+
 \paragraph{Neural NFSP on Leduc-5.}
 To confirm the result holds with a stronger victim, we run \emph{Neural NFSP} (128-64 MLP average policy, DQN best-response, reservoir-sampled action buffer) on Leduc-5. Pre-attack: $-0.13 \pm 0.09$; post-adversarial: $\mathbf{-1.89 \pm 0.16}$; post-random: $-0.89 \pm 0.06$. The adversary is $2.3\times$ more damaging than random, confirming that even proper neural game-solving methods collapse under adversarial action removal.
 
@@ -293,6 +296,9 @@ Table~\ref{tab:budget} shows victim reward as a function of adversary budget $k$
 \paragraph{CACw$_w$ correlation.}
 To verify that the adversary operates through CAC$_w$ minimisation, we compute reach-weighted CAC$_w$ at each budget level and correlate with victim reward. Across all budget levels and both adversarial and random conditions (10 seeds each), the Pearson correlation between CAC$_w$ and reward is $r = 0.77$ ($p < 0.001$); for adversarial-only conditions, $r = 0.80$. The full budget table is in Appendix~\ref{app:ablations}.
 
+\paragraph{CACv-greedy oracle.}
+We also test a direct oracle heuristic that selects the top-$k$ Kuhn states by estimated $\rho(h)\delta(h)$ and removes the victim's estimated best action. At $k=3$, CACv-greedy reaches $-0.29 \pm 0.09$, stronger than random ($-0.19 \pm 0.06$) and the learned adversary under the same short training budget ($-0.22 \pm 0.02$). This supports CACv as a mechanistic proxy: when given the value-gap statistic directly, greedy targeting produces the expected harm.
+
 % -------------------------------------------------------------------
 \subsection{Action Removal vs.\ Perturbation (RARL)}
 
@@ -315,7 +321,7 @@ Both adversaries use identical training (REINFORCE, same budget, same iterations
 
 % -------------------------------------------------------------------
 \subsection{Additional Ablations}
-The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of shared parameters (separate Q-tables match shared-agent results). The learned Kuhn mask is interpretable: it removes bluffing/value actions in high-impact states. Full ablation tables are in Appendix~\ref{app:ablations}.
+The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of parameter sharing: separate tabular Q-tables match shared-agent results, while separate DQN networks in Leduc still collapse to $-1.53 \pm 0.48$. Random action-dropout training provides only modest defense ($-2.05$ vs.\ $-2.30$ under attack). Full ablation tables are in Appendix~\ref{app:ablations}.
 
 % ===================================================================
 \section{Discussion}
@@ -486,6 +492,65 @@ Normalisation aids cross-game comparison but obscures absolute exploitability: a
 
 \section{Additional Ablations}
 \label{app:ablations}
+
+\begin{table}[ht]
+\centering
+\caption{Threat-model ablation in Leduc Q-learning: private vs.\ public information adversary.}
+\begin{tabular}{lc}
+\toprule
+Adversary information & Victim reward \\
+\midrule
+None & $+0.05 \pm 0.03$ \\
+Random mask & $-0.98 \pm 0.08$ \\
+Public info only & $-1.71 \pm 0.58$ \\
+Private info & $-2.30 \pm 0.39$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{CACv-greedy oracle at budget $k=3$ in Kuhn.}
+\begin{tabular}{lc}
+\toprule
+Masking strategy & Victim reward \\
+\midrule
+None & $-0.02 \pm 0.08$ \\
+Random & $-0.19 \pm 0.06$ \\
+Learned adversary & $-0.22 \pm 0.02$ \\
+CACv-greedy oracle & $\mathbf{-0.29 \pm 0.09}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Precise effective $L_0$ support diagnostics in Leduc Q-learning.}
+\begin{tabular}{lccc}
+\toprule
+Mask & Masked states & Seen states & Decision mask rate \\
+\midrule
+Random & 69.0 & 74.0 & 0.761 \\
+Fixed raise & 61.4 & 74.0 & 0.941 \\
+Private adversary & 47.6 & 70.8 & 0.656 \\
+Public adversary & 55.0 & 70.6 & 0.794 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Neural and defense ablations.}
+\begin{tabular}{lcc}
+\toprule
+Ablation & Setting & Victim reward \\
+\midrule
+Separate DQN networks & Leduc + adversary & $-1.53 \pm 0.48$ \\
+Action-dropout defense & Standard training & $-2.30 \pm 0.39$ \\
+Action-dropout defense & Dropout-trained & $-2.05 \pm 0.53$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[ht]
 \centering

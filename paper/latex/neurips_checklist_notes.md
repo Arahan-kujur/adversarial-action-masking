@@ -30,6 +30,9 @@ the official NeurIPS checklist.
 - Main hyperparameters are listed in Appendix C.
 - Reported uncertainty is 95% confidence intervals unless otherwise noted.
 - Largest experiment: `experiments/leduc20_scale.py`.
+- Reviewer-response ablations are in `experiments/reviewer_strengthening.py`:
+  public-information adversary, CACv-greedy oracle, exact L0 diagnostics,
+  separate-network DQN, and action-dropout defense.
 
 ## Compute
 

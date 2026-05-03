@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 15:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 15:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -505,29 +505,29 @@ Package pdftex.def Info: figures/scaling_trend.pdf  used on input line 186.
 File: figures/learning_curve_no_recovery.pdf Graphic file (type pdf)
 <use figures/learning_curve_no_recovery.pdf>
 Package pdftex.def Info: figures/learning_curve_no_recovery.pdf  used on input 
-line 216.
+line 219.
 (pdftex.def)             Requested size: 286.18967pt x 176.12592pt.
  [5 <./figures/scaling_trend.pdf>] [6 <./figures/learning_curve_no_recovery.pdf
 >]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 280.
+(hyperref)                removing `math shift' on input line 283.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 280.
+(hyperref)                removing `subscript' on input line 283.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 280.
+(hyperref)                removing `math shift' on input line 283.
 
-<figures/budget_curve.pdf, id=333, 375.804pt x 231.26399pt>
+<figures/budget_curve.pdf, id=334, 375.804pt x 231.26399pt>
 File: figures/budget_curve.pdf Graphic file (type pdf)
 <use figures/budget_curve.pdf>
-Package pdftex.def Info: figures/budget_curve.pdf  used on input line 288.
+Package pdftex.def Info: figures/budget_curve.pdf  used on input line 291.
 (pdftex.def)             Requested size: 262.34154pt x 161.44963pt.
 [7 <./figures/budget_curve.pdf>] [8] (main.bbl [9])
-Underfull \hbox (badness 1158) in paragraph at lines 362--363
+Underfull \hbox (badness 1158) in paragraph at lines 368--369
 \OT1/ptm/m/n/10 a-bil-i-ties: $\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/
 it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) = [](\OML/cmm/m/it
 /10 ^^R\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 s; \OMS/cmsy/m/n/10 ^^A\OT1/cmr/m/n/10
@@ -535,7 +535,7 @@ it/10 a\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 s\OT1/cmr/m/n/10 ) = [](\OML/cmm/m/it
 m/m/it/10 L \OT1/cmr/m/n/10 =
  []
 
-[10] [11] [12] [13] (main.aux)
+[10] [11] [12] [13] [14] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -544,13 +544,13 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 54FB8CC6F202FCC3B9A8701F32C3F839;3166.
  ) 
 Here is how much of TeX's memory you used:
- 11120 strings out of 467871
- 170781 string characters out of 5418860
- 599796 words of memory out of 5000000
+ 11127 strings out of 467871
+ 170842 string characters out of 5418860
+ 603796 words of memory out of 5000000
  39725 multiletter control sequences out of 15000+600000
  651206 words of font info for 89 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,1340b,575s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,11n,79p,1340b,569s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mbx10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmex10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -569,9 +569,9 @@ nts/symbols/msbm10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1
 /urw/times/utmb8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/
 urw/times/utmr8a.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on main.pdf (13 pages, 324883 bytes).
+Output written on main.pdf (14 pages, 328256 bytes).
 PDF statistics:
- 544 PDF objects out of 1000 (max. 8388607)
- 115 named destinations out of 1000 (max. 500000)
+ 555 PDF objects out of 1000 (max. 8388607)
+ 122 named destinations out of 1000 (max. 500000)
  176 words of extra memory for PDF output out of 10000 (max. 10000000)
 
