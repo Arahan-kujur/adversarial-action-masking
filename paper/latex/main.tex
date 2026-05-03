@@ -107,18 +107,25 @@ Under CAC$_w = 0$ in self-play Q-learning with $\varepsilon$-greedy ($\varepsilo
 \emph{Proof sketch.} Forced actions make the victim's policy Q-value-independent. The opponent faces a stationary MDP; Q-learning converges under standard conditions. The pair is stable: neither player can unilaterally deviate.
 
 \begin{proposition}[Damage bound]
-Let $\mathcal{M}$ mask a single information set $h^*$ by forcing action $a_f$. The victim's value loss relative to unmasked play is bounded by:
+Let $\mathcal{M}$ mask a single information set $h^*$ by retaining a singleton action $a_f(h^*)$. The victim's value loss relative to unmasked play is bounded by:
 \[
-\Delta V_0 \geq \rho(h^*) \cdot [Q_0(h^*, a^*) - Q_0(h^*, a_f)]
+\Delta V_0 \geq \rho(h^*) \cdot [Q_0(h^*, a^*(h^*)) - Q_0(h^*, a_f(h^*))]
 \]
-where $a^* = \arg\max_a Q_0(h^*, a)$ is the victim's best action and $\rho(h^*)$ is the reach probability. For a budget-$k$ adversary, total damage is at most:
+where $a^*(h)=\arg\max_{a\in A(h)} Q_0(h,a)$ is the victim's best action, $a_f(h)$ is the action forced by the mask at $h$, and $\rho(h)$ is the reach probability. For a budget-$k$ adversary with support $S=\text{supp}(\mathcal{M})$, the additive approximation is:
 \[
-\Delta V_0 \leq \sum_{h \in \text{supp}(\mathcal{M})} \rho(h) \cdot \max_a [Q_0(h, a^*) - Q_0(h, a)]
+\Delta V_0(\mathcal{M}) \approx
+\sum_{h \in S} \rho(h) \cdot [Q_0(h,a^*(h)) - Q_0(h,a_f(h))]
 \]
-The optimal greedy adversary selects the $k$ states with highest $\rho(h) \cdot \delta(h)$---exactly the states that maximise per-unit CAC$_v$ reduction.
+and is upper-bounded by:
+\[
+\Delta V_0(\mathcal{M}) \leq
+\sum_{h \in S} \rho(h) \cdot \max_{a_f \in A(h)\setminus\{a^*(h)\}}
+[Q_0(h,a^*(h)) - Q_0(h,a_f)].
+\]
+Thus a greedy adversary selects states with high $\rho(h)\delta(h)$, where $\delta(h)=Q_0(h,a^*(h))-Q_0(h,a_f(h))$---exactly the states that maximise per-unit CAC$_v$ reduction.
 \end{proposition}
 
-\emph{Proof.} The bound follows from the definition of Q-values and linearity of expectation over the reach-weighted trajectory. At state $h^*$, forcing $a_f$ instead of $a^*$ loses $Q_0(h^*, a^*) - Q_0(h^*, a_f)$ in expectation, weighted by $\rho(h^*)$. The greedy selection follows from submodularity of the coverage function under independent masking.\footnote{Strict submodularity holds when masking one state does not change reach probabilities of others---approximately true when masked states are on different branches of the game tree.}
+\emph{Proof.} The bound follows from the definition of Q-values and linearity of expectation over the reach-weighted trajectory. At state $h^*$, forcing $a_f(h^*)$ instead of $a^*(h^*)$ loses $Q_0(h^*,a^*(h^*)) - Q_0(h^*,a_f(h^*))$ in expectation, weighted by $\rho(h^*)$. The greedy selection follows from submodularity of the coverage function under independent masking.\footnote{Strict submodularity holds when masking one state does not change reach probabilities of others---approximately true when masked states are on different branches of the game tree.}
 
 \paragraph{Theoretical scope.}
 Propositions 1--2 provide \emph{sufficient conditions} and \emph{local bounds}, not a complete characterization of the optimal adversary. The damage bound is per-state and additive, ignoring cross-state interactions (masking state $h$ may shift reach probabilities and Q-values at downstream states). A global characterization would require solving a combinatorial optimisation over $\binom{|\mathcal{I}_0|}{k}$ mask configurations---NP-hard in general via reduction to weighted max coverage. The greedy approximation inherits a $(1 - 1/e)$ factor from the submodularity guarantee, but this holds exactly only under the independence assumption. We view these bounds as explaining \emph{why} the adversary works (targeting high $\rho \cdot \delta$ states) rather than fully characterizing \emph{how well} it can work.
@@ -206,7 +213,7 @@ Leduc-20 & \textbf{5,531} & $-0.09$ & $-0.63$ & $\mathbf{-3.00 \pm 0.15}$ & $\ma
 \end{tabular}
 \end{table}
 
-At 5,531 states the neural adversary drives DQN to $-3.00$ per hand---$4.8\times$ worse than random---with the tightest CIs of any scale ($\pm 0.15$). The adversary and random masks have comparable effective $L_0$ support (Appendix~\ref{app:protocols}); the difference is \emph{which} states are targeted.
+At 5,531 states the neural adversary drives DQN to $-3.00$ per hand---$4.8\times$ worse than random---with the tightest CIs of any scale ($\pm 0.15$). A strict matched-$L_0$ control in Leduc samples exactly the same number of states as the learned mask ($k=64.8\pm4.3$): adversarial masking reaches $-2.32\pm0.36$ while matched random reaches $-1.03\pm0.24$ ($2.24\times$ gap). The advantage is therefore \emph{which} states are targeted, not support size.
 
 \paragraph{Threat-model ablation.}
 The main poker adversary observes the victim information state. To test whether private-card access is essential, we restrict the adversary to public information only (betting history and public card, private rank hidden). In Leduc, public-info adversarial masking still reaches $-1.71 \pm 0.58$, substantially worse than random masking ($-0.98 \pm 0.08$), though weaker than private-info masking ($-2.30 \pm 0.39$). Thus private information strengthens the attack but is not required.
@@ -223,6 +230,9 @@ To confirm the result holds with a stronger victim, we run \emph{Neural NFSP} (1
 
 \paragraph{DQN masking mechanics.}
 Masked actions are filtered from the legal action list \emph{before} $\varepsilon$-greedy selection: the DQN computes Q-values for all actions, then restricts argmax and exploration to the masked subset. The victim is unaware of the masking. Total DQN training: 20k pre-training episodes (no mask) + 20 outer $\times$ 500 inner = 10k episodes under the mask. Learning curves (Appendix~\ref{app:curves}) confirm convergence: reward stabilises by episode $\sim$8k under the mask.
+
+\paragraph{OpenSpiel/CFR context.}
+Kuhn and Leduc rules match the standard imperfect-information games used in OpenSpiel~\citep{lanctot2019openspiel}; we implement them from scratch only to expose the action-mask hook at every legal-action query and to scale Leduc-N by rank count. CFR and Deep CFR~\citep{zinkevich2007regret,brown2019deep} assume a fixed game tree. Action removal changes the game tree itself, so CFR remains a useful equilibrium reference but is not a direct defense unless retrained on the masked game. Our results should therefore be read as structural robustness tests of learning dynamics under game-tree modification.
 
 % -------------------------------------------------------------------
 \subsection{Tabular Validation Across Algorithms}
@@ -519,6 +529,19 @@ None & $-0.02 \pm 0.08$ \\
 Random & $-0.19 \pm 0.06$ \\
 Learned adversary & $-0.22 \pm 0.02$ \\
 CACv-greedy oracle & $\mathbf{-0.29 \pm 0.09}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Strict matched-$L_0$ control in Leduc Q-learning. Matched random samples exactly the same number of information states as the learned adversarial mask.}
+\begin{tabular}{lcc}
+\toprule
+Masking strategy & Effective $k$ & Victim reward \\
+\midrule
+Adversarial & $64.8 \pm 4.3$ & $-2.32 \pm 0.36$ \\
+Matched random & $64.8 \pm 4.3$ & $-1.03 \pm 0.24$ \\
 \bottomrule
 \end{tabular}
 \end{table}

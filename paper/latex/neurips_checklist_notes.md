@@ -33,6 +33,7 @@ the official NeurIPS checklist.
 - Reviewer-response ablations are in `experiments/reviewer_strengthening.py`:
   public-information adversary, CACv-greedy oracle, exact L0 diagnostics,
   separate-network DQN, and action-dropout defense.
+- Strict matched-L0 control is in `experiments/matched_l0_control.py`.
 
 ## Compute
 
