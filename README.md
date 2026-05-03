@@ -43,7 +43,9 @@ We implement a bi-level optimisation:
 | `experiments/train_adversary.py` | Bi-level adversarial training |
 | `experiments/minimal_attack.py` | **Budget sweep**: how few states must the adversary target? |
 | `experiments/vulnerability_comparison.py` | Self-play vs fixed-opponent vulnerability |
-| `experiments/targeting_analysis.py` | Which states does the adversary target and why? |
+| `experiments/attack_efficiency.py` | **Headline figure**: efficiency curve (budget vs performance) |
+| `experiments/ablation_heuristic.py` | Learned vs heuristic adversaries ablation |
+| `experiments/attack_generalization.py` | Train once, test on new agents (transfer test) |
 
 ## Key Results (Kuhn Poker)
 
@@ -62,12 +64,18 @@ Self-play:       -0.98
 Fixed opponent:  -0.84
 ```
 
-**Budget sweep** -- adversary needs only 3/6 states to cause significant damage:
+**Attack transfers across agents** (trained once, works on unseen agents):
 ```
-Budget 0 (none):  -0.05
-Budget 1:         -0.02
-Budget 3:         -0.25  (adversarial >> random at -0.15)
-Budget 6 (all):   -0.92
+Transfer:   -1.03 +/- 0.01  (robust, low variance)
+Retrained:  -0.87 +/- 0.13  (per-agent, high variance)
+```
+
+**Value heuristic beats learned adversary at low budgets** (ablation):
+```
+Value heuristic:  -0.80  (targets strategically important states)
+Learned:          -0.25  (needs more training at low budget)
+Frequency:        -0.20  (no better than random)
+Random:           -0.20
 ```
 
 ## Masking Strategies
