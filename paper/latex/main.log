@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 11:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  3 MAY 2026 11:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -472,45 +472,47 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 
 
 {C:/Users/Noah/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Noah/
-AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] [2]
-<figures/attack_efficiency.png, id=131, 578.16pt x 361.35pt>
+AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] [2] [3]
+<figures/attack_efficiency.png, id=142, 578.16pt x 361.35pt>
 File: figures/attack_efficiency.png Graphic file (type png)
 <use figures/attack_efficiency.png>
-Package pdftex.def Info: figures/attack_efficiency.png  used on input line 139.
+Package pdftex.def Info: figures/attack_efficiency.png  used on input line 147.
 
 (pdftex.def)             Requested size: 317.9892pt x 198.74312pt.
- [3] [4 <./figures/attack_efficiency.png>] [5] (main.bbl) [6] (main.aux)
+ [4 <./figures/attack_efficiency.png>] [5] (main.bbl [6]) [7] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 8CA5152DEBBB87D920002FB1303D47ED;1950.
+(rerunfilecheck)             Checksum: 36516C18B494E7102364FA6F58BBB4B5;2044.
  ) 
 Here is how much of TeX's memory you used:
- 10865 strings out of 467871
- 166474 string characters out of 5418860
- 588374 words of memory out of 5000000
+ 10866 strings out of 467871
+ 166480 string characters out of 5418860
+ 589570 words of memory out of 5000000
  39544 multiletter control sequences out of 15000+600000
  643667 words of font info for 70 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,994b,510s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,13n,79p,994b,571s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/c
 mbx10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmex10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/publ
 ic/amsfonts/cm/cmmi10.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/ty
 pe1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/f
 onts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Noah/AppData/Local/Programs/M
-iKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Noah/AppData/Local/Pr
-ograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Noah/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/Noah/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb><C:
-/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/
-Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/U
-sers/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (6 pages, 260291 bytes).
+iKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Noah/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Noah/AppData/Lo
+cal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Noah/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/
+Noah/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.p
+fb><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pf
+b><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb
+><C:/Users/Noah/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb
+>
+Output written on main.pdf (7 pages, 275701 bytes).
 PDF statistics:
- 231 PDF objects out of 1000 (max. 8388607)
- 56 named destinations out of 1000 (max. 500000)
+ 244 PDF objects out of 1000 (max. 8388607)
+ 57 named destinations out of 1000 (max. 500000)
  118 words of extra memory for PDF output out of 10000 (max. 10000000)
 

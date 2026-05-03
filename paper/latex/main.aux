@@ -25,7 +25,7 @@
 \newlabel{eq:inner}{{1}{2}{Bi-level optimisation}{equation.1}{}}
 \newlabel{eq:outer}{{2}{2}{Bi-level optimisation}{equation.2}{}}
 \@writefile{toc}{\contentsline {paragraph}{Budget constraint.}{2}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Connection to CAC.}{2}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Connection to CAC.}{3}{section*.9}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Methods}{3}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Victim agents.}{3}{section*.10}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Masking strategies evaluated.}}{3}{table.1}\protected@file@percent }
@@ -35,23 +35,20 @@
 \@writefile{toc}{\contentsline {paragraph}{Environments.}{3}{section*.13}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{3}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Adversarial vs.\ Random Masking}{3}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Normalised performance (0 = worst, 1 = best) under different masking strategies. 3 seeds.}}{3}{table.2}\protected@file@percent }
-\newlabel{tab:main}{{2}{3}{Normalised performance (0 = worst, 1 = best) under different masking strategies. 3 seeds}{table.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Attack Efficiency}{3}{subsection.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Normalised performance vs.\ fraction of P0 states masked (Kuhn, 5 seeds, 95\% CIs). The adversary degrades performance faster than random at intermediate budgets.}}{4}{figure.1}\protected@file@percent }
-\newlabel{fig:efficiency}{{1}{4}{Normalised performance vs.\ fraction of P0 states masked (Kuhn, 5 seeds, 95\% CIs). The adversary degrades performance faster than random at intermediate budgets}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta $) under masking. 3 seeds. Budget: all info states.}}{3}{table.2}\protected@file@percent }
+\newlabel{tab:main}{{2}{3}{Normalised performance (0\,=\,worst, 1\,=\,best) and raw reward drop ($\Delta $) under masking. 3 seeds. Budget: all info states}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Attack Efficiency: The Core Result}{4}{subsection.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref {tab:main}, Leduc rows).}}{4}{figure.1}\protected@file@percent }
+\newlabel{fig:efficiency}{{1}{4}{Attack efficiency curve (Kuhn, 5 seeds, 95\% CIs). The adversary (red) degrades performance faster than random (blue) at intermediate budgets. At 50\% budget (3/6 states), the adversary achieves normalised performance of $0.44$ vs.\ random's $0.45$---a gap that widens in richer action spaces (see Table~\ref {tab:main}, Leduc rows)}{figure.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Self-Play Amplification}{4}{subsection.5.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Attack Generalization}{4}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Ablation: Learned vs.\ Heuristic Adversaries}{4}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Ablation: Learned vs.\ Heuristic Adversaries}{5}{subsection.5.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Targeting Analysis}{5}{subsection.5.6}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence.}}{5}{table.3}\protected@file@percent }
 \newlabel{tab:targeting}{{3}{5}{Adversary's learned mask in Kuhn Poker. ``Removed'' is the action the adversary eliminates; ``Conf.'' is the adversary's confidence}{table.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{5}{section.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Connection to decision capacity.}{5}{section*.14}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Co-adaptation as amplifier.}{5}{section*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Structural vs.\ agent-specific attacks.}{5}{section*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Implications for deployment.}{5}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{5}{section.7}\protected@file@percent }
 \bibstyle{plainnat}
 \bibdata{references}
 \bibcite{altman1999constrained}{{1}{1999}{{Altman}}{{}}}
@@ -65,5 +62,8 @@
 \bibcite{lanctot2019openspiel}{{9}{2019}{{Lanctot et~al.}}{{Lanctot, Lockhart, Lespiau, Zambaldi, et~al.}}}
 \bibcite{silver2018general}{{10}{2018}{{Silver et~al.}}{{Silver, Hubert, Schrittwieser, et~al.}}}
 \bibcite{zhang2020adaptive}{{11}{2020}{{Zhang et~al.}}{{Zhang, Ma, Singla, and Zhu}}}
+\@writefile{toc}{\contentsline {paragraph}{Structural vs.\ agent-specific attacks.}{6}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Implications for deployment.}{6}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{6}{section.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{6}{section.8}\protected@file@percent }
-\gdef \@abspage@last{6}
+\gdef \@abspage@last{7}
