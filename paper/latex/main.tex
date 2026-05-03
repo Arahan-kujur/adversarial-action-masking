@@ -21,7 +21,7 @@
 
 % ===================================================================
 \begin{abstract}
-We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. Unlike random or fixed removal, a learned adversary targets strategically important decision points. In Kuhn and Leduc Poker, across Q-Learning and PPO victims, we show that: (i)~adversarial masking causes significantly more damage than random masking at the same budget---and is $5\times$ more damaging than RARL-style action perturbation; (ii)~the adversary learns to minimise the victim's effective contingent action capacity by targeting high-value decision nodes; (iii)~self-play dynamics amplify the attack through co-adaptation; and (iv)~the learned attack transfers to unseen agents, indicating structural rather than agent-specific vulnerability. A detailed budget sweep reveals that at intermediate budgets, a value-based heuristic can match the learned adversary, but the latter generalises without requiring access to the victim's Q-table. These results demonstrate that self-play RL systems are brittle to small, targeted action-space perturbations, with implications for adversarial robustness in deployed multi-agent systems.
+We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. Unlike random or fixed removal, a learned adversary targets strategically important decision points. In Kuhn and Leduc Poker, across Q-Learning, PPO, DQN, and NFSP victims, we show that: (i)~adversarial masking causes significantly more damage than random masking at the same budget---and is $5\times$ more damaging than RARL-style action perturbation; (ii)~the adversary learns to minimise the victim's effective contingent action capacity by targeting high-value decision nodes; (iii)~self-play dynamics amplify the attack through co-adaptation; and (iv)~the learned attack transfers to unseen agents, indicating structural rather than agent-specific vulnerability. A detailed budget sweep reveals that at intermediate budgets, a value-based heuristic can match the learned adversary, but the latter generalises without requiring access to the victim's Q-table. These results demonstrate that self-play RL systems are brittle to small, targeted action-space perturbations, with implications for adversarial robustness in deployed multi-agent systems.
 \end{abstract}
 
 % ===================================================================
@@ -104,7 +104,7 @@ The DEA's practical significance is that it represents maximal exploitation: the
 \section{Methods}
 
 \paragraph{Victim agents.}
-We evaluate two victim algorithms: \textbf{Tabular Q-Learning} ($\varepsilon$-greedy, $\varepsilon = 0.15$, $\alpha = 0.1$) and \textbf{Tabular PPO} (softmax policy, clipped surrogate loss, entropy bonus). Both train via self-play: a single agent plays both roles with Q-values/preferences indexed by player-specific information states.
+We evaluate four victim algorithms: \textbf{Tabular Q-Learning} ($\varepsilon$-greedy, $\varepsilon = 0.15$, $\alpha = 0.1$), \textbf{Tabular PPO} (softmax policy, clipped surrogate loss, entropy bonus; details in Appendix~\ref{app:ppo}), \textbf{DQN} (2-layer MLP, experience replay, target network; used for Leduc), and \textbf{Tabular NFSP}~\citep{heinrich2016deep} (best-response Q-learning + average strategy, $\eta = 0.1$). All train via self-play: a single agent plays both roles with values indexed by player-specific information states.
 
 \paragraph{Masking strategies.}
 \begin{table}[ht]
@@ -301,6 +301,25 @@ Self-play dynamics amplify the adversary's effect: once the victim's policy shif
 \paragraph{Structural vs.\ agent-specific attacks.}
 The transfer experiment reveals that the adversary's learned mask is a property of the \emph{game}, not the \emph{agent}: it transfers to unseen agents with lower variance than per-agent retrained attacks. This has practical implications: an attacker who understands the game's structure can design a universal attack that works against any policy trained in that game.
 
+\subsection{Neural-Scale Adversary (DQN Victim in Leduc)}
+
+To verify the phenomenon persists with function approximation, we train a DQN victim in Leduc Poker against a neural adversary (2-layer MLP, 32 hidden units, REINFORCE outer loop):
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Strategy & Leduc DQN Victim Reward \\
+\midrule
+None & $-0.09 \pm 0.11$ \\
+Random ($p=0.5$) & $-0.74 \pm 0.17$ \\
+Fixed (raise) & $-0.35 \pm 0.31$ \\
+Neural adversary & $\mathbf{-3.29 \pm 0.48}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The neural adversary is $4.5\times$ more damaging than random masking and $9\times$ worse than fixed removal, driving the DQN victim to $-3.29$ per hand. This confirms that adversarial action removal scales to function approximation agents in richer games. The bi-level REINFORCE training successfully learns a targeted masking strategy that exploits the victim's learned policy structure.
+
 \paragraph{Algorithm-invariant vulnerability.}
 We additionally test a tabular NFSP agent~\citep{heinrich2016deep} (best-response QL + average strategy, $\eta = 0.1$). Under full adversarial masking, NFSP's pre-attack reward of $+0.12 \pm 0.12$ drops to $-0.45 \pm 0.18$---comparable to Q-Learning and PPO collapse. NFSP's average-strategy component, which tracks historical play to approximate a Nash equilibrium, cannot compensate when the action space itself is reduced: the average of a set of constrained policies is still constrained. This confirms that the vulnerability is \emph{structural} (action-space dependent) rather than algorithmic.
 
@@ -371,6 +390,24 @@ Clip $\epsilon$ & 0.2 \\
 Entropy bonus & 0.01 \\
 Baseline & Running mean of returns \\
 Batch size & Full episode \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{DQN hyperparameters (Leduc).}
+\begin{tabular}{lc}
+\toprule
+Parameter & Value \\
+\midrule
+Network & 37 $\to$ 64 $\to$ 64 $\to$ 3 \\
+Learning rate & $10^{-3}$ (Adam) \\
+$\varepsilon$ schedule & $1.0 \to 0.05$ (decay $0.9999$) \\
+Replay buffer & 20\,000 \\
+Batch size & 64 \\
+Target update & every 500 episodes \\
+Discount $\gamma$ & 1.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
