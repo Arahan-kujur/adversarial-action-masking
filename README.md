@@ -1,111 +1,168 @@
-# Adversarial Action Masking in Self-Play RL
+# Adversarial Action Removal in Self-Play RL
 
-An adversary learns to remove actions from an RL agent mid-training,
-exploiting co-adaptation dynamics in self-play. We study which masking
-strategies cause the most damage and whether agents can adapt.
+This repository contains the experiments and paper source for **Adversarial Action Removal in Self-Play Reinforcement Learning**.
+
+The paper studies a structural adversarial attack: instead of perturbing observations or replacing chosen actions, an attacker removes legal actions from the victim's available action set before action selection. The main finding is that targeted action removal is substantially more damaging than random masking or learned action perturbation, and the effect persists across algorithms, domains, and game sizes.
+
+## Highlights
+
+- New attack surface: adversarial removal of legal actions.
+- Bi-level adversary: victim trains under a mask; adversary learns which actions to remove.
+- Mechanism: reach-weighted and value-weighted contingent action capacity (`CAC_w`, `CAC_v`).
+- Scale: poker variants from Kuhn (6 victim information states) to Leduc-20 (5,531 victim information states).
+- Algorithms: Q-learning, PPO, NFSP, neural NFSP, and DQN.
+- Domains: poker, competitive gridworld, and resource collection.
+- NeurIPS-style paper source and reproducibility notes included.
+
+## Key Results
+
+### Scaling With Game Size
+
+| Game | Victim Info States | Victim | Adversarial / Random Damage |
+|---|---:|---|---:|
+| Leduc | ~50 | DQN | 2.2x |
+| Leduc-5 | 389 | DQN | 4.6x |
+| Leduc-10 | 1,496 | DQN | 4.7x |
+| Leduc-20 | 5,531 | DQN | 4.8x |
+
+The adversary remains effective as game complexity grows. The largest run, Leduc-20, reaches `-3.00 +/- 0.15` victim reward versus `-0.63 +/- 0.08` for random masking.
+
+### Reviewer-Response Controls
+
+| Control | Result |
+|---|---|
+| Public-information adversary | Still beats random in Leduc: `-1.71` vs `-0.98` |
+| Matched-L0 random baseline | Same support size, adversary still 2.24x worse |
+| CACv-greedy oracle | Stronger than random and short-trained learned adversary |
+| Separate-network DQN | Collapse persists without shared parameters |
+| Evaluation-only masking | Immediate damage: `-0.58` after normal training |
+| Mask-aware training from scratch | Still collapses: `-2.71` |
+| Action-dropout defense | Helps modestly: `-1.82` vs standard `-2.45` |
+| Random mask-ensemble defense | Does not help: `-2.64` |
+
+## Repository Layout
+
+```text
+adversary/
+  masking_policy.py        Random, fixed, and learned action-removal policies
+  mask_utils.py            Evaluation and mask statistics
+
+core/
+  agents/
+    q_learning.py          Tabular Q-learning
+    ppo.py                 Tabular PPO
+    nfsp.py                Tabular NFSP
+    neural_nfsp.py         Neural NFSP
+    dqn.py                 DQN + encoders for Kuhn/Leduc/Leduc-N
+  envs/
+    kuhn_poker.py          Kuhn Poker
+    leduc_poker.py         Leduc Poker
+    leduc_n.py             Leduc-N scale variants
+    gridworld.py           Competitive gridworld
+    resource_collection.py Resource collection game
+  training/
+    selfplay.py            Shared self-play loop
+
+experiments/
+  leduc20_scale.py         Largest DQN scaling run
+  leduc10_scale.py         Leduc-10 scaling run
+  leduc5_scale.py          Leduc-5 scaling run
+  neural_nfsp_leduc5.py    Neural NFSP under attack
+  reviewer_strengthening.py Public-info, CACv oracle, L0, separate DQN, dropout
+  matched_l0_control.py    Strict matched-L0 random control
+  mask_timing_controls.py  Evaluation-only and mask-aware victim controls
+  mask_ensemble_defense.py Mask-ensemble defense baseline
+  generate_neurips_figures.py Figure generation script
+
+paper/
+  paper.md                 Markdown paper summary
+  latex/
+    main.tex               NeurIPS-style LaTeX source
+    main.pdf               Compiled PDF
+    figures/               Generated figures
+    references.bib         Bibliography
+```
+
+## Installation
+
+Python 3.10+ is recommended.
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # Windows PowerShell
+pip install -r requirements.txt
+```
+
+Dependencies:
+
+- `numpy`
+- `torch`
+- `matplotlib`
 
 ## Quick Start
 
+Run the smallest attack comparison:
+
 ```bash
-pip install -r requirements.txt
-
-# Train agent, then evaluate under fixed mask
-python experiments/train_selfplay.py
-
-# Train adversarial masking policy
-python experiments/train_adversary.py
-
-# Compare all masking strategies
 python experiments/evaluate_attack.py
 ```
 
-## What is Adversarial Action Masking?
+Run the main scaling experiments:
 
-Standard action masking removes invalid actions (e.g., illegal moves).
-**Adversarial** action masking asks: what if an attacker chooses *which*
-actions to remove, in order to maximise the agent's loss?
-
-This is relevant when:
-- Hardware failures disable specific actuators
-- An adversary controls which API endpoints are available
-- Regulatory changes remove actions strategically
-
-We implement a bi-level optimisation:
-- **Inner loop**: RL agent trains via self-play under the mask
-- **Outer loop**: adversary learns which actions to remove to minimise agent reward
-
-## Experiments
-
-| Script | What it does |
-|---|---|
-| `experiments/evaluate_attack.py` | Compare all masking strategies side-by-side |
-| `experiments/train_selfplay.py` | Train agent, evaluate under fixed mask |
-| `experiments/train_adversary.py` | Bi-level adversarial training |
-| `experiments/minimal_attack.py` | **Budget sweep**: how few states must the adversary target? |
-| `experiments/vulnerability_comparison.py` | Self-play vs fixed-opponent vulnerability |
-| `experiments/attack_efficiency.py` | **Headline figure**: efficiency curve (budget vs performance) |
-| `experiments/ablation_heuristic.py` | Learned vs heuristic adversaries ablation |
-| `experiments/attack_generalization.py` | Train once, test on new agents (transfer test) |
-
-## Key Results (Kuhn Poker)
-
-**Adversarial >> Random** (same number of actions removed):
-```
-No mask:            -0.12
-Random (p=0.3):      0.00
-Random (p=0.7):     -0.50
-Fixed (remove BET): -0.94
-Adversarial:        -1.05
+```bash
+python experiments/leduc5_scale.py
+python experiments/leduc10_scale.py
+python experiments/leduc20_scale.py
 ```
 
-**Self-play amplifies the attack**:
-```
-Self-play:       -0.98
-Fixed opponent:  -0.84
-```
+Run the reviewer-response controls:
 
-**Attack transfers across agents** (trained once, works on unseen agents):
-```
-Transfer:   -1.03 +/- 0.01  (robust, low variance)
-Retrained:  -0.87 +/- 0.13  (per-agent, high variance)
+```bash
+python experiments/reviewer_strengthening.py
+python experiments/matched_l0_control.py
+python experiments/mask_timing_controls.py
+python experiments/mask_ensemble_defense.py
 ```
 
-**Value heuristic beats learned adversary at low budgets** (ablation):
-```
-Value heuristic:  -0.80  (targets strategically important states)
-Learned:          -0.25  (needs more training at low budget)
-Frequency:        -0.20  (no better than random)
-Random:           -0.20
+Regenerate figures:
+
+```bash
+python experiments/generate_neurips_figures.py
 ```
 
-## Masking Strategies
+Compile the paper:
 
-| Strategy | Description |
-|---|---|
-| No mask | Baseline -- full action space |
-| Random | Remove actions with probability p per step |
-| Fixed | Always remove a specific action (e.g., BET) |
-| Adversarial | Learned policy choosing which action to remove per state |
-| Adversarial (budget) | Same, but limited to masking at k states |
-
-## Project Structure
-
-```
-core/
-  envs/kuhn_poker.py       Kuhn Poker env + MaskedKuhnPoker wrapper
-  agents/q_learning.py      Tabular Q-learning agent
-  training/selfplay.py      Self-play training loop
-adversary/
-  masking_policy.py          Masking strategies (random, fixed, adversarial)
-  mask_utils.py              Evaluation and analysis utilities
-experiments/
-  train_selfplay.py          Train + evaluate under fixed mask
-  train_adversary.py         Bi-level adversarial training
-  evaluate_attack.py         Compare all strategies side-by-side
-configs/                     Experiment configurations
-results/                     Output (gitignored CSVs)
+```bash
+cd paper/latex
+pdflatex -interaction=nonstopmode main.tex
+bibtex main
+pdflatex -interaction=nonstopmode main.tex
+pdflatex -interaction=nonstopmode main.tex
 ```
 
-## Requirements
+## Paper
 
-Python 3.10+. Only dependency: `numpy`.
+The NeurIPS-style source is in [`paper/latex/main.tex`](paper/latex/main.tex), with the compiled PDF at [`paper/latex/main.pdf`](paper/latex/main.pdf).
+
+The main body is kept within the NeurIPS 9-page target; supporting ablations, hyperparameters, normalization bounds, and learning curves are in the appendix.
+
+## Reproducibility
+
+All reported experiments are standalone Python scripts under `experiments/`. Seeds are fixed inside the scripts. The largest experiment (`experiments/leduc20_scale.py`) uses five seeds, 30k victim pre-training episodes, and 25 adversary outer iterations with 500 victim-training episodes per adversary update.
+
+## Citation
+
+If you use this code, cite the repository or paper draft:
+
+```bibtex
+@misc{kujur2026adversarialactionremoval,
+  title={Adversarial Action Removal in Self-Play Reinforcement Learning},
+  author={Kujur, Arahan},
+  year={2026},
+  note={Preprint}
+}
+```
+
+## License
+
+No license file is currently included. Add a license before public release if you plan to distribute or accept contributions.

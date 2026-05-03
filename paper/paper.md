@@ -1,245 +1,135 @@
 # Adversarial Action Removal in Self-Play Reinforcement Learning
 
-**Arahan Kujur** | Independent Researcher | kujurarahan@gmail.com
+**Arahan Kujur**  
+Independent Researcher  
+`kujurarahan@gmail.com`
 
----
+> This Markdown file is a GitHub-readable summary. The authoritative paper is the NeurIPS-style LaTeX draft in [`paper/latex/main.tex`](latex/main.tex), with compiled PDF at [`paper/latex/main.pdf`](latex/main.pdf).
 
 ## Abstract
 
-We study adversarial action masking in self-play reinforcement learning:
-an attacker selectively removes actions from a learning agent's action space
-to maximise performance degradation. Unlike random or fixed action removal,
-a learned adversary targets strategically important decision points ---
-states where action removal causes disproportionate damage. In Kuhn and
-Leduc Poker, across Q-Learning and PPO victims, we show that: (i) adversarial
-masking causes significantly more damage than random masking at the same
-budget; (ii) the adversary learns to minimise the victim's effective
-contingent action capacity (CAC) by targeting high-value decision nodes;
-(iii) self-play dynamics amplify the attack through co-adaptation; and
-(iv) the learned attack transfers to unseen agents, indicating structural
-rather than agent-specific vulnerability. These results demonstrate that
-self-play RL systems are brittle to small, targeted action-space
-perturbations, with implications for adversarial robustness in deployed
-multi-agent systems.
+We study **adversarial action removal** in self-play reinforcement learning: an attacker selectively removes legal actions from a victim's action set before action selection. Unlike observation or action perturbations, removal changes the feasible action set itself. Across poker games scaling from Kuhn (6 information states) to Leduc-20 (5,531), plus two non-poker domains, learned masking is substantially more damaging than random masking and learned perturbation baselines. The attack persists across Q-learning, PPO, NFSP, neural NFSP, and DQN victims. We connect the mechanism to reach-weighted and value-weighted contingent action capacity (`CAC_w`, `CAC_v`), showing that targeted removal at high-reach, high-value-gap states causes persistent collapse.
 
----
+## Main Claim
 
-## 1. Introduction
+Self-play RL agents are brittle to **targeted elimination of decision options**. Preserving raw action count is not enough; robustness depends on retaining strategically important choices at high-reach states.
 
-Multi-agent reinforcement learning agents trained via self-play achieve
-strong performance in competitive domains, but their robustness to
-structural environment changes remains poorly understood. Prior work on
-adversarial attacks in RL focuses on observation perturbations or reward
-manipulation. We study a different attack surface: the action space itself.
+## Contributions
 
-An adversary that can selectively remove actions --- disabling specific
-capabilities rather than adding noise --- poses a qualitatively different
-threat. We formalise this as a bi-level optimisation: the inner loop trains
-an RL agent under masked actions, while the outer loop trains an adversary
-to choose which actions to remove.
+- Formalizes adversarial action removal as a bi-level optimization over legal-action masks.
+- Shows learned removal is more damaging than random masking and learned perturbation under matched training budgets.
+- Scales evaluation from 6 to 5,531 victim information states.
+- Tests tabular and neural victims: Q-learning, PPO, NFSP, neural NFSP, and DQN.
+- Adds two non-poker domains: competitive gridworld and resource collection.
+- Introduces `CAC_w` and `CAC_v` as interpretable mechanisms for strategic decision-capacity loss.
+- Includes reviewer-response controls: public-only adversary, matched-L0 random, CACv-greedy oracle, separate-network DQN, mask timing, and mask-robust training baselines.
 
-Our key insight is that adversarial masking induces collapse by selectively
-eliminating high-impact decision points, effectively minimising the victim's
-reach-weighted contingent action capacity (CAC_w). This connects action-space
-attacks to the structural threshold phenomenon identified in prior work on
-decision capacity in self-play.
+## Key Results
 
-**Contributions:**
-- We introduce the adversarial action masking problem: a learned attacker
-  chooses which actions to remove from a self-play RL agent.
-- We show that adversarial removal causes significantly more damage than
-  random removal at equal budget, and that the attack transfers across agents.
-- We demonstrate that self-play co-adaptation amplifies the adversary's
-  effect beyond what a fixed-opponent setting produces.
-- We connect the attack mechanism to contingent action capacity, showing
-  the adversary learns to target states of high strategic importance.
+### Scaling
 
----
+| Game | Victim Info States | Victim | Adversarial / Random Damage |
+|---|---:|---|---:|
+| Leduc | ~50 | DQN | 2.2x |
+| Leduc-5 | 389 | DQN | 4.6x |
+| Leduc-10 | 1,496 | DQN | 4.7x |
+| Leduc-20 | 5,531 | DQN | 4.8x |
 
-## 2. Related Work
+![Scaling trend](latex/figures/scaling_trend.png)
 
-**Adversarial attacks on RL.** Adversarial observation perturbations
-[Gleave et al., 2020; Huang et al., 2017] and reward poisoning
-[Zhang et al., 2020] are well-studied. Action-space attacks are less
-explored; invalid action masking [Huang & Ontanon, 2022] addresses the
-opposite problem (preventing illegal actions). We study deliberate,
-strategic action removal.
+### No Recovery
 
-**Self-play robustness.** Self-play agents can cycle or overfit to their
-own weaknesses [Balduzzi et al., 2019; Lanctot et al., 2019]. Population
-methods (PSRO) [Lanctot et al., 2017] maintain diversity. We show that
-even with diverse training, targeted action removal can induce collapse.
+Victims do not recover under continued masked training. In Leduc, evaluation-only masking already degrades a normally trained victim, while continued and mask-aware training converge to larger losses.
 
-**Decision capacity.** Contingent action capacity (CAC) governs whether
-self-play agents collapse under action-space constraints [Kujur, 2026].
-We extend this: an adversary can efficiently drive CAC_w toward zero by
-targeting a small number of high-reach, high-value decision points.
+| Protocol | Victim Reward |
+|---|---:|
+| No mask | `+0.05 +/- 0.03` |
+| Evaluation-only mask | `-0.58 +/- 0.18` |
+| Continued masked training | `-2.65 +/- 0.30` |
+| Mask-aware training from scratch | `-2.71 +/- 0.26` |
 
----
+![No recovery](latex/figures/learning_curve_no_recovery.png)
 
-## 3. Problem Formulation
+### Matched-L0 Fairness
 
-**Setup.** A two-player zero-sum game with self-play training. Player 0
-(victim) learns via RL. An adversary M observes the game state and chooses
-a mask:
+The learned adversary does not win by masking more states. Under a strict matched-L0 control in Leduc:
 
-  mask = M(info_state, legal_actions, player)
+| Mask | Effective k | Victim Reward |
+|---|---:|---:|
+| Adversarial | `64.8 +/- 4.3` | `-2.32 +/- 0.36` |
+| Matched random | `64.8 +/- 4.3` | `-1.03 +/- 0.24` |
 
-returning a subset of legal actions available to the victim.
+The advantage is **which states** are targeted, not how many.
 
-**Bi-level optimisation.**
-- Inner: victim trains policy π under adversary's mask M
-- Outer: adversary updates M to minimise victim's expected reward
+### Public vs Private Information
 
-**Budget.** The adversary can mask at most k of the victim's information
-sets. This models realistic constraints: an attacker controls a limited
-number of action endpoints.
+Private victim information strengthens the attack but is not required.
 
-**Connection to CAC.** Each masked state with >1 action that is reduced
-to 1 action decreases CAC by 1. The adversary's goal is to reduce
-reach-weighted CAC_w as efficiently as possible, targeting states where
-the marginal impact on the victim's value is highest.
+| Adversary Information | Victim Reward |
+|---|---:|
+| None | `+0.05 +/- 0.03` |
+| Random mask | `-0.98 +/- 0.08` |
+| Public info only | `-1.71 +/- 0.58` |
+| Private info | `-2.30 +/- 0.39` |
 
----
+### Defense Baselines
 
-## 4. Methods
+| Defense | Victim Reward Under Attack |
+|---|---:|
+| Standard training | `-2.45 +/- 0.60` |
+| Stochastic action dropout | `-1.82 +/- 0.31` |
+| Random mask ensemble | `-2.64 +/- 0.54` |
 
-**Victim agents.** Tabular Q-Learning (epsilon-greedy) and Tabular PPO
-(softmax policy). Self-play: single agent plays both roles.
+Random unavailability is not enough; defenses likely need to preserve capacity at high-`CAC_v` states.
 
-**Masking strategies.**
+## Method Summary
 
-| Strategy | Description |
-|---|---|
-| None | Full action space (baseline) |
-| Random(p) | Remove each action independently with probability p |
-| Fixed | Always remove a specific action (e.g., BET) |
-| Adversarial | Learned per-state removal policy |
-| Adversarial(k) | Budget-limited: mask at most k info states |
-| Value heuristic | Remove at states with highest |Q-value| |
+An adversary defines a mask:
 
-**Adversary training.** Softmax policy over removal preferences per info
-state, trained via policy gradient with reward signal = negative victim
-reward. 20 outer iterations of 500 inner episodes each.
+```text
+M(info_state, legal_actions, player) -> retained_actions
+```
 
-**Environments.** Kuhn Poker (2 actions, 6 P0 info states) and Leduc
-Poker (3 actions, ~50 P0 info states).
+The mask must retain at least one legal action. By default, the adversary removes exactly one action per masked state or chooses a no-op. In low-arity games this may force singleton action sets; in larger action spaces it leaves multiple alternatives.
 
----
+Training alternates:
 
-## 5. Experiments
+1. **Inner loop**: victim trains under the current mask.
+2. **Outer loop**: adversary updates its removal policy using REINFORCE with reward `-victim_reward`.
 
-### 5.1 Adversarial vs Random Masking
+## Mechanism: CACw and CACv
 
-Normalised performance (0 = worst, 1 = best) across games and algorithms:
+`CAC_w` measures remaining decision capacity weighted by reach probability:
 
-| Setting | None | Random | Fixed | Adversarial |
-|---|---|---|---|---|
-| Kuhn + QL | 0.487 | 0.451 | 0.269 | **0.267** |
-| Kuhn + PPO | 0.486 | 0.424 | 0.253 | **0.274** |
-| Leduc + QL | 0.502 | 0.462 | 0.489 | **0.367** |
-| Leduc + PPO | 0.497 | 0.452 | 0.490 | **0.369** |
+```text
+CAC_w = sum_h rho(h) * 1[more than one action remains at h]
+```
 
-In Kuhn, adversarial and fixed removal produce comparable collapse (both
-near 0.27) because there are only 2 actions and full removal eliminates all
-strategic choice. In Leduc (3 actions), adversarial masking (0.37) causes
-far more damage than fixed removal (0.49) because the adversary learns
-which action to remove per-state, exploiting the richer action space. This
-is the key result: adversarial masking is most effective when the adversary
-can make state-dependent choices in games with multiple actions.
+`CAC_v` additionally weights by the value gap between the best action and the forced remaining action:
 
-### 5.2 Attack Efficiency (Budget Sweep)
+```text
+CAC_v = sum_h rho(h) * delta(h) * 1[more than one action remains at h]
+```
 
-The adversary causes a sharper performance drop than random masking at
-intermediate budgets. At budget 3/6 (50% of Kuhn states), adversarial
-masking reduces normalised performance to 0.44 vs random's 0.45.
+Empirically, `CAC_v` correlates better with victim reward than `CAC_w`, and a CACv-greedy oracle outperforms random masking.
 
-![Attack Efficiency](figures/attack_efficiency.png)
+## Scope and Limitations
 
-### 5.3 Self-Play Amplification
+- The attack is defined for **discrete action spaces**.
+- Continuous-action analogues would require region exclusion rather than action removal.
+- Theory provides local/sufficient bounds, not a full characterization of the global optimal adversary.
+- Larger real-world benchmarks and stronger mask-aware defenses remain open directions.
 
-Under adversarial masking:
-- Self-play:       -0.975 (co-adaptation amplifies attack)
-- Fixed opponent:  -0.841 (no amplification)
+## Reproducibility
 
-The self-play regime is more vulnerable because the opponent co-adapts
-to exploit the victim's constrained policy.
+All major experiments are standalone scripts under [`../experiments`](../experiments):
 
-### 5.4 Attack Generalization
+- `leduc20_scale.py` - largest scaling experiment
+- `neural_nfsp_leduc5.py` - neural NFSP
+- `reviewer_strengthening.py` - public-info, CACv oracle, L0 diagnostics, separate-network DQN, dropout
+- `matched_l0_control.py` - strict matched-L0 random baseline
+- `mask_timing_controls.py` - evaluation-only and mask-aware victim controls
+- `mask_ensemble_defense.py` - mask-ensemble defense
+- `generate_neurips_figures.py` - paper figures
 
-An adversary trained on one agent (seed 42) transfers to unseen agents:
-- Transfer:   -1.03 +/- 0.01 (robust, low variance)
-- Retrained:  -0.87 +/- 0.13 (per-agent, higher variance)
-
-The transferred adversary is MORE effective than per-agent retrained
-adversaries, indicating it has learned the game's structural
-vulnerability rather than agent-specific exploits.
-
-### 5.5 Ablation: Learned vs Heuristic Adversaries
-
-At budget 3/6 states:
-- Value heuristic:  -0.80 (targets high |Q-value| states)
-- Learned:          -0.25 (partially converged)
-- Frequency:        -0.20 (no better than random)
-- Random:           -0.20
-
-The value heuristic outperforms the learned adversary at low budgets,
-suggesting that strategic importance (not visit frequency) determines
-attack effectiveness.
-
-### 5.6 Targeting Analysis
-
-The adversary learns state-dependent removal strategies:
-
-| State | Card | Action Removed | Confidence |
-|---|---|---|---|
-| 0 (root) | J | BET | 0.99 |
-| 0pb | J facing bet | PASS | 0.99 |
-| 1 (root) | Q | PASS | 0.95 |
-| 2 (root) | K | BET | 0.98 |
-| 2pb | K facing bet | BET | 0.98 |
-
-The adversary removes the victim's optimal action at each state:
-BET from J (prevents bluffing), PASS from J-facing-bet (forces call
-with worst hand), PASS from Q (forces bet with medium hand), BET from K
-(prevents value extraction with best hand).
-
----
-
-## 6. Discussion
-
-**Connection to decision capacity.** Adversarial masking induces collapse
-by selectively eliminating high-impact decision points, effectively
-minimising reach-weighted contingent action capacity (CAC_w). Where
-uniform action removal requires eliminating ALL decisions to trigger
-the CAC_w = 0 threshold, an adversary achieves comparable damage by
-targeting only the strategically important subset.
-
-**Co-adaptation as amplifier.** Self-play dynamics amplify the adversary's
-effect: once the victim's policy shifts due to masking, the opponent
-adapts to exploit the shift, creating a reinforcing spiral. This is the
-same co-adaptation mechanism identified in the decision capacity
-literature, now weaponised by an intelligent attacker.
-
-**Implications for deployment.** Real-world multi-agent systems where an
-adversary can disable specific agent capabilities (API endpoints,
-actuators, communication channels) are vulnerable to targeted collapse.
-Defences should focus on maintaining strategic flexibility at high-reach
-decision points, not just preserving action count.
-
----
-
-## 7. Conclusion
-
-We show that self-play RL agents are brittle to small, targeted
-action-space attacks. A learned adversary causes more damage than random
-masking, transfers across agents, and is amplified by self-play
-co-adaptation. The mechanism operates through reduction of effective
-decision capacity at strategically important states, connecting
-adversarial robustness to the structural properties of the game.
-
----
-
-## References
-
-*To be populated with full citations.*
+The LaTeX appendix contains hyperparameters, normalization bounds, additional ablations, and learning-curve details.
