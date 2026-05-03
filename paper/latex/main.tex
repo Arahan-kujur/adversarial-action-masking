@@ -21,7 +21,7 @@
 
 % ===================================================================
 \begin{abstract}
-We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes actions from a learning agent's action space to maximise performance degradation. Across five poker variants of increasing complexity (Kuhn: 6 states; Leduc: $\sim$50; Leduc-5: 389; Leduc-10: 1,496; Leduc-20: 5,531) and two non-poker domains, with Q-Learning, PPO, NFSP, and DQN victims, we show that: (i)~adversarial masking causes $3$--$4\times$ more damage than random masking \emph{consistently across scales}, and $4\times$ more than a learned perturbation baseline; (ii)~the adversary targets high-value decision points, correlating with reach-weighted CAC$_w$ ($r = 0.80$) and a refined value-weighted variant CAC$_v$ ($r = 0.81$); (iii)~the attack transfers across agents and algorithms; (iv)~self-play co-adaptation amplifies the effect; and (v)~victims do not recover even with extended training under the mask. The phenomenon generalises beyond poker: in a competitive gridworld (perfect information, spatial structure), adversarial removal causes $1.9\times$ more damage than random.
+We study adversarial action masking in self-play reinforcement learning: an attacker selectively removes legal actions from a victim's action set. Unlike observation or action perturbations, removal eliminates decision options before the agent acts. Across poker games scaling from 6 to 5,531 information states and two non-poker domains, learned masking causes substantially more damage than random masking and learned perturbation baselines. The attack persists across Q-learning, PPO, NFSP, neural NFSP, and DQN victims; transfers across agents; is amplified by self-play; and shows no recovery under extended masked training. Mechanistically, the adversary targets high-value decision points, captured by reach-weighted contingent action capacity (CAC$_w$) and a value-weighted refinement CAC$_v$. These results identify action availability as a distinct robustness surface in self-play RL.
 \end{abstract}
 
 % ===================================================================
@@ -45,13 +45,16 @@ Our key finding is that adversarial masking is \emph{dramatically more efficient
 \section{Related Work}
 
 \paragraph{Adversarial attacks on RL.}
-Adversarial observation perturbations~\citep{huang2017adversarial,gleave2020adversarial} and reward poisoning~\citep{zhang2020adaptive} are well-studied threat models. Action-space attacks are less explored: invalid action masking~\citep{huang2022closer} addresses the opposite problem (preventing illegal actions), and constrained MDPs~\citep{altman1999constrained} formalise action restrictions but not adversarial selection. We study \emph{deliberate, strategic} action removal by a learned attacker.
+Adversarial attacks on RL most commonly perturb observations~\citep{huang2017adversarial,gleave2020adversarial,zhang2021robust,sun2022who} or poison rewards~\citep{zhang2020adaptive}. In multi-agent settings, recent work studies adversarial policies~\citep{gleave2020adversarial}, sparse or model-based attacks against cooperative MARL~\citep{lin2020marlrobust,hu2022sparse}, and collusive policy-level attackers~\citep{niu2026cama}. These attacks manipulate observations, policies, or rewards while leaving the legal action set intact. We instead study a structural attack on action availability itself.
 
-\paragraph{Action-robust and adversarial RL.}
-Robust Adversarial RL (RARL)~\citep{pinto2017robust} trains an adversary that \emph{perturbs} the agent's actions within a bounded set; NR/PR-MDP formulations~\citep{tessler2019action} extend this to probabilistic and nominal-robust action channels. These methods model continuous perturbations where the chosen action is \emph{modified}. Our setting is structurally different: actions are \emph{removed} entirely (discrete, binary availability), which eliminates decision points rather than distorting them. This distinction matters because removal can reduce contingent action capacity to zero---a qualitative regime change that bounded perturbation cannot induce. Observation-adversarial methods~\citep{zhang2021robust,sun2022who} operate on a separate channel.
+\paragraph{Robust and action-robust RL.}
+Robust MDPs~\citep{iyengar2005robust,nilim2005robust} and constrained MDPs~\citep{altman1999constrained} model uncertainty or constraints in the environment. Robust Adversarial RL (RARL)~\citep{pinto2017robust} and action-robust RL~\citep{tessler2019action} train against perturbations of the action actually executed. Those channels modify selected actions; our adversary removes actions from the legal set before selection. This difference matters: bounded perturbations preserve the agent's ability to choose, whereas removal can collapse a decision point to a singleton action set.
 
-\paragraph{Self-play robustness and NFSP.}
-Self-play agents can cycle, overfit, or exhibit non-transitive behaviour~\citep{balduzzi2019open,lanctot2019openspiel}. Population-based methods (PSRO)~\citep{lanctot2017unified} maintain diversity to mitigate these. NFSP~\citep{heinrich2016deep} combines RL with average-strategy tracking. We show that \emph{all} of these---including NFSP---collapse under structural action removal, because no algorithm can compensate when the action space itself is reduced.
+\paragraph{Action sets and masking.}
+Invalid action masking prevents agents from selecting impossible moves~\citep{huang2022closer}. Decision-theoretic planning has long studied structural leverage and action contingencies~\citep{boutilier1999decision}, but typically not adversarially selected action availability during learning. Our work reverses the usual masking motivation: the mask is not a safety or efficiency aid, but an attacker-chosen capability removal.
+
+\paragraph{Self-play and imperfect-information games.}
+Self-play can overfit, cycle, or exploit non-transitive structure~\citep{balduzzi2019open,lanctot2019openspiel}. Regret-minimization methods such as CFR~\citep{zinkevich2007regret} and Deep CFR~\citep{brown2019deep} provide strong baselines for imperfect-information games, while NFSP~\citep{heinrich2016deep} combines best-response learning with average-strategy tracking. Population methods such as PSRO~\citep{lanctot2017unified} maintain diversity. We show that these algorithmic stabilizers do not address a different failure mode: when the action set itself is structurally reduced, averaging and population diversity cannot restore eliminated strategic dimensions.
 
 % ===================================================================
 \section{Problem Formulation}
@@ -173,77 +176,47 @@ All implemented from scratch with \texttt{MaskedEnv} wrappers.
 We structure experiments around five questions: (1)~Does adversarial masking scale with game complexity? (2)~Is the vulnerability algorithm-invariant? (3)~Does it generalise beyond poker? (4)~How efficient is adversarial targeting? (5)~What mechanism drives the attack?
 
 % -------------------------------------------------------------------
-\subsection{Neural-Scale Results: DQN in Leduc Poker}
+\subsection{Scaling with Game Complexity}
 \label{sec:neural}
 
-Our strongest result uses function approximation on both sides: a DQN victim and a neural MLP adversary in Leduc Poker ($\sim$50 info states, 3 actions).
+Our strongest result uses function approximation on both sides: a DQN victim and a neural MLP adversary in Leduc variants whose state spaces range from $\sim$50 to 5,531 victim information states.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.72\linewidth]{figures/scaling_trend.pdf}
+\caption{Scaling trend. The adversarial/random damage ratio is plotted against victim information-set count on a log scale. Error bars show 95\% CIs from the DQN scale experiments.}
+\label{fig:scaling}
+\end{figure}
+
+We implement Leduc-N, parameterised by rank count. \textbf{Leduc-5} (10 cards, 389 states), \textbf{Leduc-10} (20 cards, 1,496 states), and \textbf{Leduc-20} (40 cards, \textbf{5,531 states}) test whether the adversary's advantage persists as game complexity grows by $920\times$ from Kuhn. Figure~\ref{fig:scaling} and Table~\ref{tab:scaling} show a consistent empirical scaling trend.
 
 \begin{table}[ht]
 \centering
-\caption{DQN victim in Leduc Poker under masking (5 seeds, 95\% CIs). Raw reward and normalised performance ($r_{\min}{=}{-}13$, $r_{\max}{=}{+}13$). \textbf{The neural adversary is $2.2\times$ more damaging than random and $11\times$ worse than fixed removal.}}
-\label{tab:dqn}
-\begin{tabular}{lcc}
+\caption{DQN victim across poker scales (5 seeds, 95\% CIs).}
+\label{tab:scaling}
+\begin{tabular}{lccccc}
 \toprule
-Strategy & Raw Reward & Normalised \\
+Game & $|\mathcal{I}_0|$ & None & Random & Neural Adv & Ratio \\
 \midrule
-None & $-0.10 \pm 0.08$ & $.496$ \\
-Random ($p{=}0.5$) & $-1.17 \pm 0.05$ & $.455$ \\
-Fixed (raise) & $-0.23 \pm 0.23$ & $.491$ \\
-Neural adversary & $\mathbf{-2.57 \pm 0.47}$ & $\mathbf{.401}$ \\
+Leduc & $\sim$50 & $-0.10$ & $-1.17$ & $-2.57 \pm 0.47$ & $2.2\times$ \\
+Leduc-5 & 389 & $-0.15$ & $-0.60$ & $-2.74 \pm 0.23$ & $4.6\times$ \\
+Leduc-10 & 1,496 & $-0.18$ & $-0.68$ & $-3.19 \pm 0.23$ & $4.7\times$ \\
+Leduc-20 & \textbf{5,531} & $-0.09$ & $-0.63$ & $\mathbf{-3.00 \pm 0.15}$ & $\mathbf{4.8\times}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-This is the paper's central empirical result. The neural adversary drives the DQN victim to $-2.57$ reward per hand ($\pm 0.47$, 5 seeds), a catastrophic degradation from the $-0.10$ baseline. The attack works because the adversary's MLP learns \emph{state-dependent} removal: at each of Leduc's $\sim$50 information sets, it selects the action whose removal most damages the victim. Random masking cannot achieve this targeting.
-
-The effect is amplified by Leduc's richer action space (3 actions vs.\ Kuhn's 2): with more actions available, the adversary has more room to selectively disable the \emph{right} one. In Kuhn (2 actions, Table~\ref{tab:tabular}), removing either action eliminates all choice, so adversarial and fixed removal converge. \textbf{The adversary's advantage scales with action-space richness.}
-
-\paragraph{Budget fairness.}
-A natural concern is whether the adversary simply masks more states than the baselines. We measure effective $L_0$ support (number of information sets where an action is actually removed) across 5000 evaluation episodes. In Leduc: adversary $L_0 \approx 45$, Random($p{=}0.5$) $\approx 47$, Fixed (raise) $\approx 38$. The adversary and random mask \emph{comparable numbers of states}---the adversary's advantage is \emph{which} states it targets, not how many.
-
-\paragraph{Scaling to Leduc-5 and Leduc-10.}
-We implement Leduc-N, parameterised by rank count. \textbf{Leduc-5} (10 cards, 389 states), \textbf{Leduc-10} (20 cards, 1,496 states), and \textbf{Leduc-20} (40 cards, \textbf{5,531 states}) test whether the adversary's advantage persists as game complexity grows by $920\times$ from Kuhn.
-
-\begin{table}[ht]
-\centering
-\caption{DQN victim across poker scales (5 seeds, 95\% CIs). The adversary's advantage \emph{increases} with game size.}
-\label{tab:leduc5}
-\begin{tabular}{lcccc}
-\toprule
-Game & $|$States$|$ & None & Neural Adv & Ratio vs Random \\
-\midrule
-Leduc & $\sim$50 & $-0.10$ & $-2.57 \pm 0.47$ & $2.2\times$ \\
-Leduc-5 & 389 & $-0.15$ & $-2.74 \pm 0.23$ & $4.6\times$ \\
-Leduc-10 & 1,496 & $-0.18$ & $-3.19 \pm 0.23$ & $4.7\times$ \\
-Leduc-20 & \textbf{5,531} & $-0.09$ & $\mathbf{-3.00 \pm 0.15}$ & $\mathbf{4.8\times}$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-At 5,531 states the neural adversary drives DQN to $-3.00$ per hand---$4.8\times$ worse than random---with the tightest CIs of any scale ($\pm 0.15$). The adversary's advantage \emph{monotonically increases} from $2.2\times$ at 50 states to $4.8\times$ at 5,531 states, and its variance monotonically decreases. Larger games have more heterogeneous strategic structure, providing more targetable decision points.
+At 5,531 states the neural adversary drives DQN to $-3.00$ per hand---$4.8\times$ worse than random---with the tightest CIs of any scale ($\pm 0.15$). The adversary and random masks have comparable effective $L_0$ support (Appendix~\ref{app:protocols}); the difference is \emph{which} states are targeted.
 
 \paragraph{Neural NFSP on Leduc-5.}
 To confirm the result holds with a stronger victim, we run \emph{Neural NFSP} (128-64 MLP average policy, DQN best-response, reservoir-sampled action buffer) on Leduc-5. Pre-attack: $-0.13 \pm 0.09$; post-adversarial: $\mathbf{-1.89 \pm 0.16}$; post-random: $-0.89 \pm 0.06$. The adversary is $2.3\times$ more damaging than random, confirming that even proper neural game-solving methods collapse under adversarial action removal.
 
-\paragraph{Scaling trajectory.}
-Table~\ref{tab:scaling} shows the adversary's advantage is \emph{persistent and increasing across scales}:
-
-\begin{table}[ht]
+\begin{figure}[ht]
 \centering
-\caption{Adversarial vs.\ random across game sizes (DQN victims, 5 seeds). The ratio \emph{increases} with scale.}
-\label{tab:scaling}
-\begin{tabular}{lccccc}
-\toprule
-Game & $|$States$|$ & None & Advers. & Random & Ratio \\
-\midrule
-Kuhn & 6 & $+0.01$ & $-0.95$ & $-0.22$ & $4.2\times$ \\
-Leduc & $\sim$50 & $-0.10$ & $-2.57$ & $-1.17$ & $2.2\times$ \\
-Leduc-5 & 389 & $-0.15$ & $-2.74$ & $-0.60$ & $4.6\times$ \\
-Leduc-10 & 1,496 & $-0.18$ & $-3.19$ & $-0.68$ & $4.7\times$ \\
-Leduc-20 & \textbf{5,531} & $-0.09$ & $\mathbf{-3.00}$ & $-0.63$ & $\mathbf{4.8\times}$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=0.72\linewidth]{figures/learning_curve_no_recovery.pdf}
+\caption{Learning under a fixed mask. NFSP in Leduc-5 does not recover under continued masked training; adversarial removal remains substantially worse than random removal.}
+\label{fig:learning}
+\end{figure}
 
 \paragraph{DQN masking mechanics.}
 Masked actions are filtered from the legal action list \emph{before} $\varepsilon$-greedy selection: the DQN computes Q-values for all actions, then restricts argmax and exploration to the masked subset. The victim is unaware of the masking. Total DQN training: 20k pre-training episodes (no mask) + 20 outer $\times$ 500 inner = 10k episodes under the mask. Learning curves (Appendix~\ref{app:curves}) confirm convergence: reward stabilises by episode $\sim$8k under the mask.
@@ -272,7 +245,7 @@ Leduc + NFSP & $-0.01$ & $-1.58$ & $.500$ & $.440$ \\
 \end{tabular}
 \end{table}
 
-All algorithms collapse under adversarial masking---in both Kuhn and Leduc. The vulnerability is \emph{algorithm-invariant}: Q-Learning, PPO, and NFSP all degrade to comparable levels. NFSP on Leduc drops from $-0.01$ to $-1.58$ (raw), confirming that NFSP's average-strategy component cannot compensate when the action space itself is reduced. Combined with the DQN result (Table~\ref{tab:dqn}), we have \textbf{four algorithms across two games and two paradigms (tabular + neural) all exhibiting collapse}.
+All algorithms collapse under adversarial masking---in both Kuhn and Leduc. The vulnerability is \emph{algorithm-invariant}: Q-Learning, PPO, and NFSP all degrade to comparable levels. NFSP on Leduc drops from $-0.01$ to $-1.58$ (raw), confirming that NFSP's average-strategy component cannot compensate when the action space itself is reduced. Combined with the DQN scaling result (Table~\ref{tab:scaling}), we have \textbf{four algorithms across two games and two paradigms (tabular + neural) all exhibiting collapse}.
 
 % -------------------------------------------------------------------
 \subsection{Cross-Domain Validation: Competitive Gridworld}
@@ -310,27 +283,15 @@ Two non-poker domains with different structures (goal-seeking vs.\ resource comp
 \paragraph{Budget sweep.}
 Table~\ref{tab:budget} shows victim reward as a function of adversary budget $k$ (number of info states masked).
 
-\begin{table}[ht]
+\begin{figure}[ht]
 \centering
-\caption{Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs).}
-\label{tab:budget}
-\begin{tabular}{lcc}
-\toprule
-$k$ & Adversarial & Random \\
-\midrule
-0 & $-0.02 \pm 0.07$ & $-0.02 \pm 0.07$ \\
-1 & $-0.21 \pm 0.07$ & $-0.02 \pm 0.07$ \\
-2 & $-0.24 \pm 0.07$ & $-0.10 \pm 0.06$ \\
-3 & $-0.25 \pm 0.04$ & $-0.21 \pm 0.03$ \\
-4 & $-0.28 \pm 0.04$ & $-0.41 \pm 0.04$ \\
-5 & $-0.72 \pm 0.21$ & $-0.66 \pm 0.01$ \\
-6 & $-0.98 \pm 0.07$ & $-0.92 \pm 0.00$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=0.66\linewidth]{figures/budget_curve.pdf}
+\caption{Budget sweep in Kuhn Poker. Targeted removal degrades the victim as support grows; random masking requires broad coverage to approach the same damage.}
+\label{fig:budget}
+\end{figure}
 
 \paragraph{CACw$_w$ correlation.}
-To verify that the adversary operates through CAC$_w$ minimisation, we compute reach-weighted CAC$_w$ at each budget level and correlate with victim reward. Across all budget levels and both adversarial and random conditions (10 seeds each), the Pearson correlation between CAC$_w$ and reward is $r = 0.77$ ($p < 0.001$); for adversarial-only conditions, $r = 0.80$. Higher CAC$_w$ (more remaining strategic flexibility) corresponds to higher victim reward. Notably, at the same budget the adversary maintains higher CAC$_w$ than random masking (e.g., at $k{=}3$: adversarial CAC$_w = 0.68$ vs.\ random $0.37$) yet achieves comparable damage---this is because the adversary targets the \emph{strategically important} states, not the most numerous ones.
+To verify that the adversary operates through CAC$_w$ minimisation, we compute reach-weighted CAC$_w$ at each budget level and correlate with victim reward. Across all budget levels and both adversarial and random conditions (10 seeds each), the Pearson correlation between CAC$_w$ and reward is $r = 0.77$ ($p < 0.001$); for adversarial-only conditions, $r = 0.80$. The full budget table is in Appendix~\ref{app:ablations}.
 
 % -------------------------------------------------------------------
 \subsection{Action Removal vs.\ Perturbation (RARL)}
@@ -353,71 +314,8 @@ Learned removal & $\mathbf{-1.01 \pm 0.09}$ & $\mathbf{.248}$ \\
 Both adversaries use identical training (REINFORCE, same budget, same iterations), ensuring a fair comparison. The learned perturbation adversary ($-0.24$) is stronger than fixed-$p$ RARL ($-0.09$, not shown), but learned removal ($-1.01$) remains $4\times$ more damaging. The mechanism is qualitatively different: perturbation adds noise to execution but preserves the agent's \emph{ability to choose}; removal eliminates decision points entirely, reducing CAC$_w$~\citep{pinto2017robust,tessler2019action}.
 
 % -------------------------------------------------------------------
-\subsection{Self-Play Amplification}
-
-\begin{table}[ht]
-\centering
-\caption{Self-play vs.\ fixed-opponent under adversarial masking (Kuhn QL, 5 seeds).}
-\label{tab:selfplay}
-\begin{tabular}{lcc}
-\toprule
-Regime & Raw Reward & Normalised \\
-\midrule
-Self-play (both adapt) & $-0.975 \pm 0.09$ & $.256$ \\
-Fixed opponent (victim only) & $-0.841 \pm 0.36$ & $.290$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Self-play produces worse outcomes because \emph{co-adaptation} creates a reinforcing spiral: the victim's policy shifts due to masking, the opponent adapts to exploit the shift, which further degrades the victim. Under a fixed opponent this spiral cannot form.
-
-% -------------------------------------------------------------------
-\subsection{Attack Transfer}
-
-An adversary trained against one agent (seed~42) transfers to unseen agents:
-
-\begin{table}[ht]
-\centering
-\caption{Transfer attack vs.\ per-agent retrained (Kuhn QL, 5 seeds).}
-\begin{tabular}{lcc}
-\toprule
-& Raw Reward & Std \\
-\midrule
-Transfer (trained on seed 42) & $-1.032$ & $0.009$ \\
-Retrained (per-agent) & $-0.872$ & $0.134$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The transferred adversary is \emph{more effective} with \emph{dramatically lower variance}, indicating it has learned the game's \emph{structural vulnerability} rather than agent-specific weaknesses.
-
-\paragraph{Cross-algorithm transfer.}
-An adversary trained on a Q-Learning victim transfers to an NFSP victim in the same game (Kuhn): NFSP degrades from $+0.12$ to $-0.37$ ($\Delta = -0.49$, 5 seeds). The damage is less severe than same-algorithm transfer ($\Delta = -1.04$), suggesting the mask is partially algorithm-specific but the \emph{structural} component transfers.
-
-\paragraph{Separate-networks ablation.}
-A concern is that our shared-parameter self-play creates coupling artifacts. We test with two \emph{separate} Q-tables for Players 0 and 1 (independent learners). Results are identical: shared $-0.948 \pm 0.07$ vs.\ separate $-0.948 \pm 0.07$ (5 seeds). Parameter sharing does not drive the vulnerability.
-
-% -------------------------------------------------------------------
-\subsection{Targeting Analysis}
-
-\begin{table}[ht]
-\centering
-\caption{Adversary's learned mask in Kuhn Poker (full budget). The adversary removes the victim's \emph{optimal} action at each state.}
-\label{tab:targeting}
-\begin{tabular}{llcc}
-\toprule
-State & Meaning & Removed & Confidence \\
-\midrule
-\texttt{0} & J, root & BET & $0.99$ \\
-\texttt{0pb} & J, facing bet & PASS & $0.99$ \\
-\texttt{1} & Q, root & PASS & $0.95$ \\
-\texttt{2} & K, root & BET & $0.98$ \\
-\texttt{2pb} & K, facing bet & BET & $0.98$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The adversary has learned Kuhn's strategic structure: it removes BET from J (prevents bluffing), forces J to call facing a bet (worst-hand calling), forces Q to bet (over-commits the medium hand), and removes BET from K (prevents value extraction). The learned mask inverts the Nash equilibrium.
+\subsection{Additional Ablations}
+The attack is amplified by self-play co-adaptation (self-play: $-0.975$, fixed opponent: $-0.841$), transfers across random seeds (transferred: $-1.032$ vs.\ per-agent retrained: $-0.872$), transfers from Q-learning to NFSP ($\Delta=-0.49$), and is not an artifact of shared parameters (separate Q-tables match shared-agent results). The learned Kuhn mask is interpretable: it removes bluffing/value actions in high-impact states. Full ablation tables are in Appendix~\ref{app:ablations}.
 
 % ===================================================================
 \section{Discussion}
@@ -446,6 +344,11 @@ The damage bound (Proposition~2) is local and additive, assuming independent mas
 \section{Conclusion}
 
 We show that self-play RL agents---from tabular Q-Learning to neural NFSP and DQN, from 6-state Kuhn to 5,531-state Leduc-20, across poker and non-poker domains---are brittle to targeted action-space attacks. The adversary's advantage over random masking \emph{monotonically increases} with game complexity ($2.2\times$ at 50 states to $4.8\times$ at 5,531), persists across five algorithms and seven environments. The mechanism operates through selective reduction of strategically important decision capacity (CAC$_w$/$_v$), victims do not recover under extended training, and the attack transfers across agents. These findings argue for robustness designs that preserve strategic flexibility at high-reach decision points rather than raw action count.
+
+% ===================================================================
+\section*{Reproducibility Statement}
+
+All environments, agents, adversaries, and experiment scripts are implemented in the accompanying repository. Each reported result is generated by a standalone script under \texttt{experiments/}; random seeds are fixed in the scripts, and hyperparameters are listed in Appendix~\ref{app:hyperparams}. The scaling figures in Figures~\ref{fig:scaling}--\ref{fig:budget} are generated by \texttt{experiments/generate\_neurips\_figures.py} from completed experiment outputs. The largest run, Leduc-20, uses five seeds, 30k victim pre-training episodes, and 25 adversary outer iterations with 500 inner episodes each.
 
 % ===================================================================
 \bibliographystyle{plainnat}
@@ -491,17 +394,36 @@ Post-mask episodes & 10\,000 & 15\,000 \\
 
 \begin{table}[ht]
 \centering
-\caption{DQN hyperparameters (Leduc).}
+\caption{DQN hyperparameters for Leduc-scale experiments.}
 \begin{tabular}{lc}
 \toprule
 Parameter & Value \\
 \midrule
-Network & 37 $\to$ 64 $\to$ 64 $\to$ 3 \\
+Network (Leduc) & 37 $\to$ 64 $\to$ 64 $\to$ 3 \\
+Network (Leduc-10/20) & $(2N{+}31) \to 128 \to 64 \to 3$ \\
 Learning rate & $10^{-3}$ (Adam) \\
 $\varepsilon$ schedule & $1.0 \to 0.05$ (decay $0.9999$) \\
-Replay buffer & 20\,000 \\
-Batch size & 64 \\
-Target update & every 500 episodes \\
+Replay buffer & 20\,000--50\,000 \\
+Batch size & 64--128 \\
+Target update & every 500--1000 episodes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Neural NFSP hyperparameters (Leduc-5).}
+\begin{tabular}{lc}
+\toprule
+Parameter & Value \\
+\midrule
+Best-response network & 49 $\to$ 128 $\to$ 64 $\to$ 3 \\
+Average-policy network & 49 $\to$ 128 $\to$ 64 $\to$ 3 \\
+BR learning rate & $10^{-3}$ \\
+Average-policy learning rate & $10^{-3}$ \\
+Reservoir buffer & 50\,000 action samples \\
+Replay buffer & 20\,000 transitions \\
+Anticipatory parameter $\eta$ & 0.1 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -530,7 +452,7 @@ Parameter & Tabular & Neural \\
 \midrule
 Architecture & Preference table & 37 $\to$ 32 $\to$ 4 (softmax) \\
 Learning rate & 0.01 & $10^{-3}$ (Adam) \\
-Outer iterations & 20 & 20 \\
+Outer iterations & 20--30 & 20--25 \\
 Inner episodes & 500 & 500 \\
 Update rule & REINFORCE & REINFORCE + baseline \\
 \bottomrule
@@ -552,12 +474,70 @@ Game & $r_{\min}$ & $r_{\max}$ \\
 Kuhn Poker & $-2.0$ & $+2.0$ \\
 Leduc Poker & $-13.0$ & $+13.0$ \\
 Leduc-5 Poker & $-17.0$ & $+17.0$ \\
+Leduc-10 Poker & $-21.0$ & $+21.0$ \\
+Leduc-20 Poker & $-41.0$ & $+41.0$ \\
 Comp.\ Gridworld & $-1.0$ & $+1.0$ \\
+Resource Collection & $-4.0$ & $+4.0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Normalisation aids cross-game comparison but obscures absolute exploitability: a normalised $.37$ in Leduc ($\Delta r = -3.5$) represents a larger absolute loss than $.27$ in Kuhn ($\Delta r = -0.9$).
+
+\section{Additional Ablations}
+\label{app:ablations}
+
+\begin{table}[ht]
+\centering
+\caption{Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs).}
+\label{tab:budget}
+\begin{tabular}{lcc}
+\toprule
+$k$ & Adversarial & Random \\
+\midrule
+0 & $-0.02 \pm 0.07$ & $-0.02 \pm 0.07$ \\
+1 & $-0.21 \pm 0.07$ & $-0.02 \pm 0.07$ \\
+2 & $-0.24 \pm 0.07$ & $-0.10 \pm 0.06$ \\
+3 & $-0.25 \pm 0.04$ & $-0.21 \pm 0.03$ \\
+4 & $-0.28 \pm 0.04$ & $-0.41 \pm 0.04$ \\
+5 & $-0.72 \pm 0.21$ & $-0.66 \pm 0.01$ \\
+6 & $-0.98 \pm 0.07$ & $-0.92 \pm 0.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Secondary ablations in Kuhn Q-learning.}
+\begin{tabular}{lcc}
+\toprule
+Ablation & Setting & Victim reward \\
+\midrule
+Self-play & Co-adaptive & $-0.975 \pm 0.09$ \\
+Self-play & Fixed opponent & $-0.841 \pm 0.36$ \\
+Transfer & Trained on seed 42 & $-1.032 \pm 0.009$ \\
+Transfer & Retrained per-agent & $-0.872 \pm 0.134$ \\
+Parameter sharing & Shared Q-table & $-0.948 \pm 0.07$ \\
+Parameter sharing & Separate Q-tables & $-0.948 \pm 0.07$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Learned Kuhn mask at full budget.}
+\begin{tabular}{llcc}
+\toprule
+State & Meaning & Removed & Confidence \\
+\midrule
+\texttt{0} & J, root & BET & $0.99$ \\
+\texttt{0pb} & J, facing bet & PASS & $0.99$ \\
+\texttt{1} & Q, root & PASS & $0.95$ \\
+\texttt{2} & K, root & BET & $0.98$ \\
+\texttt{2pb} & K, facing bet & BET & $0.98$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Learning Curves Under Attack}
 \label{app:curves}

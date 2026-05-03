@@ -7,127 +7,137 @@
 \citation{zhang2020adaptive}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Contributions.}{1}{section*.1}\protected@file@percent }
-\citation{huang2017adversarial,gleave2020adversarial}
+\citation{huang2017adversarial,gleave2020adversarial,zhang2021robust,sun2022who}
 \citation{zhang2020adaptive}
-\citation{huang2022closer}
+\citation{gleave2020adversarial}
+\citation{lin2020marlrobust,hu2022sparse}
+\citation{niu2026cama}
+\citation{iyengar2005robust,nilim2005robust}
 \citation{altman1999constrained}
 \citation{pinto2017robust}
 \citation{tessler2019action}
-\citation{zhang2021robust,sun2022who}
+\citation{huang2022closer}
+\citation{boutilier1999decision}
 \citation{balduzzi2019open,lanctot2019openspiel}
-\citation{lanctot2017unified}
+\citation{zinkevich2007regret}
+\citation{brown2019deep}
 \citation{heinrich2016deep}
+\citation{lanctot2017unified}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Adversarial attacks on RL.}{2}{section*.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Action-robust and adversarial RL.}{2}{section*.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Self-play robustness and NFSP.}{2}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Robust and action-robust RL.}{2}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Action sets and masking.}{2}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Self-play and imperfect-information games.}{2}{section*.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Problem Formulation}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Game model.}{2}{section*.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Adversary definition.}{2}{section*.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Bi-level optimisation.}{2}{section*.7}\protected@file@percent }
-\newlabel{eq:inner}{{1}{2}{Bi-level optimisation}{equation.1}{}}
-\newlabel{eq:outer}{{2}{2}{Bi-level optimisation}{equation.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{Adversary implementation.}{3}{section*.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Connection to CAC$_w$.}{3}{section*.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Deterministic Exploitation Attractor (DEA).}{3}{section*.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Theoretical scope.}{3}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Game model.}{2}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Adversary definition.}{2}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Bi-level optimisation.}{3}{section*.8}\protected@file@percent }
+\newlabel{eq:inner}{{1}{3}{Bi-level optimisation}{equation.1}{}}
+\newlabel{eq:outer}{{2}{3}{Bi-level optimisation}{equation.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Adversary implementation.}{3}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Connection to CAC$_w$.}{3}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Deterministic Exploitation Attractor (DEA).}{3}{section*.11}\protected@file@percent }
 \citation{heinrich2016deep}
+\@writefile{toc}{\contentsline {paragraph}{Theoretical scope.}{4}{section*.12}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Methods}{4}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Self-play protocol.}{4}{section*.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Victim agents.}{4}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Self-play protocol.}{4}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Victim agents.}{4}{section*.14}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Masking strategies evaluated.}}{4}{table.1}\protected@file@percent }
 \newlabel{tab:strategies}{{1}{4}{Masking strategies evaluated}{table.1}{}}
 \@writefile{toc}{\contentsline {paragraph}{Masking strategies.}{4}{table.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Adversary architectures.}{4}{section*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Environments.}{4}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Adversary architectures.}{4}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Environments.}{4}{section*.17}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{4}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Neural-Scale Results: DQN in Leduc Poker}{4}{subsection.5.1}\protected@file@percent }
-\newlabel{sec:neural}{{5.1}{4}{Neural-Scale Results: DQN in Leduc Poker}{subsection.5.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces DQN victim in Leduc Poker under masking (5 seeds, 95\% CIs). Raw reward and normalised performance ($r_{\min }{=}{-}13$, $r_{\max }{=}{+}13$). \textbf  {The neural adversary is $2.2\times $ more damaging than random and $11\times $ worse than fixed removal.}}}{5}{table.2}\protected@file@percent }
-\newlabel{tab:dqn}{{2}{5}{DQN victim in Leduc Poker under masking (5 seeds, 95\% CIs). Raw reward and normalised performance ($r_{\min }{=}{-}13$, $r_{\max }{=}{+}13$). \textbf {The neural adversary is $2.2\times $ more damaging than random and $11\times $ worse than fixed removal.}}{table.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{Budget fairness.}{5}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Scaling to Leduc-5 and Leduc-10.}{5}{section*.18}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces DQN victim across poker scales (5 seeds, 95\% CIs). The adversary's advantage \emph  {increases} with game size.}}{5}{table.3}\protected@file@percent }
-\newlabel{tab:leduc5}{{3}{5}{DQN victim across poker scales (5 seeds, 95\% CIs). The adversary's advantage \emph {increases} with game size}{table.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{Neural NFSP on Leduc-5.}{5}{section*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Scaling trajectory.}{5}{section*.20}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Adversarial vs.\ random across game sizes (DQN victims, 5 seeds). The ratio \emph  {increases} with scale.}}{5}{table.4}\protected@file@percent }
-\newlabel{tab:scaling}{{4}{5}{Adversarial vs.\ random across game sizes (DQN victims, 5 seeds). The ratio \emph {increases} with scale}{table.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{DQN masking mechanics.}{6}{section*.21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Tabular Validation Across Algorithms}{6}{subsection.5.2}\protected@file@percent }
-\newlabel{sec:tabular}{{5.2}{6}{Tabular Validation Across Algorithms}{subsection.5.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Tabular agents in Kuhn and Leduc under masking (5 seeds). Both raw reward ($r$) and normalised performance shown.}}{6}{table.5}\protected@file@percent }
-\newlabel{tab:tabular}{{5}{6}{Tabular agents in Kuhn and Leduc under masking (5 seeds). Both raw reward ($r$) and normalised performance shown}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Scaling with Game Complexity}{5}{subsection.5.1}\protected@file@percent }
+\newlabel{sec:neural}{{5.1}{5}{Scaling with Game Complexity}{subsection.5.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Scaling trend. The adversarial/random damage ratio is plotted against victim information-set count on a log scale. Error bars show 95\% CIs from the DQN scale experiments.}}{5}{figure.1}\protected@file@percent }
+\newlabel{fig:scaling}{{1}{5}{Scaling trend. The adversarial/random damage ratio is plotted against victim information-set count on a log scale. Error bars show 95\% CIs from the DQN scale experiments}{figure.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces DQN victim across poker scales (5 seeds, 95\% CIs).}}{5}{table.2}\protected@file@percent }
+\newlabel{tab:scaling}{{2}{5}{DQN victim across poker scales (5 seeds, 95\% CIs)}{table.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Neural NFSP on Leduc-5.}{5}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{DQN masking mechanics.}{5}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Tabular Validation Across Algorithms}{5}{subsection.5.2}\protected@file@percent }
+\newlabel{sec:tabular}{{5.2}{5}{Tabular Validation Across Algorithms}{subsection.5.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Learning under a fixed mask. NFSP in Leduc-5 does not recover under continued masked training; adversarial removal remains substantially worse than random removal.}}{6}{figure.2}\protected@file@percent }
+\newlabel{fig:learning}{{2}{6}{Learning under a fixed mask. NFSP in Leduc-5 does not recover under continued masked training; adversarial removal remains substantially worse than random removal}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Tabular agents in Kuhn and Leduc under masking (5 seeds). Both raw reward ($r$) and normalised performance shown.}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:tabular}{{3}{6}{Tabular agents in Kuhn and Leduc under masking (5 seeds). Both raw reward ($r$) and normalised performance shown}{table.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Cross-Domain Validation: Competitive Gridworld}{6}{subsection.5.3}\protected@file@percent }
 \newlabel{sec:crossdomain}{{5.3}{6}{Cross-Domain Validation: Competitive Gridworld}{subsection.5.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Cross-domain: Competitive Gridworld (5$\times $5, 5 actions, 149 P0 states, 5 seeds).}}{6}{table.6}\protected@file@percent }
-\newlabel{tab:gridworld}{{6}{6}{Cross-domain: Competitive Gridworld (5$\times $5, 5 actions, 149 P0 states, 5 seeds)}{table.6}{}}
-\@writefile{toc}{\contentsline {paragraph}{Resource Collection (4$\times $4).}{6}{section*.22}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Cross-domain: Competitive Gridworld (5$\times $5, 5 actions, 149 P0 states, 5 seeds).}}{6}{table.4}\protected@file@percent }
+\newlabel{tab:gridworld}{{4}{6}{Cross-domain: Competitive Gridworld (5$\times $5, 5 actions, 149 P0 states, 5 seeds)}{table.4}{}}
 \citation{pinto2017robust,tessler2019action}
+\@writefile{toc}{\contentsline {paragraph}{Resource Collection (4$\times $4).}{7}{section*.20}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Attack Efficiency and CAC$_w$ Correlation}{7}{subsection.5.4}\protected@file@percent }
 \newlabel{sec:efficiency}{{5.4}{7}{Attack Efficiency and CAC$_w$ Correlation}{subsection.5.4}{}}
-\@writefile{toc}{\contentsline {paragraph}{Budget sweep.}{7}{section*.23}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs).}}{7}{table.7}\protected@file@percent }
-\newlabel{tab:budget}{{7}{7}{Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs)}{table.7}{}}
-\@writefile{toc}{\contentsline {paragraph}{CACw$_w$ correlation.}{7}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Budget sweep.}{7}{section*.21}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Budget sweep in Kuhn Poker. Targeted removal degrades the victim as support grows; random masking requires broad coverage to approach the same damage.}}{7}{figure.3}\protected@file@percent }
+\newlabel{fig:budget}{{3}{7}{Budget sweep in Kuhn Poker. Targeted removal degrades the victim as support grows; random masking requires broad coverage to approach the same damage}{figure.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{CACw$_w$ correlation.}{7}{section*.22}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Action Removal vs.\ Perturbation (RARL)}{7}{subsection.5.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Action removal vs.\ perturbation: both with \emph  {learned} adversary (Kuhn, 10 seeds, 95\% CIs). Both adversaries use the same REINFORCE training (20 outer $\times $ 500 inner). Removal is $4\times $ more damaging even when the perturbation adversary is given equal training budget.}}{7}{table.8}\protected@file@percent }
-\newlabel{tab:rarl}{{8}{7}{Action removal vs.\ perturbation: both with \emph {learned} adversary (Kuhn, 10 seeds, 95\% CIs). Both adversaries use the same REINFORCE training (20 outer $\times $ 500 inner). Removal is $4\times $ more damaging even when the perturbation adversary is given equal training budget}{table.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Self-Play Amplification}{7}{subsection.5.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Self-play vs.\ fixed-opponent under adversarial masking (Kuhn QL, 5 seeds).}}{7}{table.9}\protected@file@percent }
-\newlabel{tab:selfplay}{{9}{7}{Self-play vs.\ fixed-opponent under adversarial masking (Kuhn QL, 5 seeds)}{table.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Attack Transfer}{8}{subsection.5.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Transfer attack vs.\ per-agent retrained (Kuhn QL, 5 seeds).}}{8}{table.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Cross-algorithm transfer.}{8}{section*.25}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Separate-networks ablation.}{8}{section*.26}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Targeting Analysis}{8}{subsection.5.8}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Adversary's learned mask in Kuhn Poker (full budget). The adversary removes the victim's \emph  {optimal} action at each state.}}{8}{table.11}\protected@file@percent }
-\newlabel{tab:targeting}{{11}{8}{Adversary's learned mask in Kuhn Poker (full budget). The adversary removes the victim's \emph {optimal} action at each state}{table.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Action removal vs.\ perturbation: both with \emph  {learned} adversary (Kuhn, 10 seeds, 95\% CIs). Both adversaries use the same REINFORCE training (20 outer $\times $ 500 inner). Removal is $4\times $ more damaging even when the perturbation adversary is given equal training budget.}}{7}{table.5}\protected@file@percent }
+\newlabel{tab:rarl}{{5}{7}{Action removal vs.\ perturbation: both with \emph {learned} adversary (Kuhn, 10 seeds, 95\% CIs). Both adversaries use the same REINFORCE training (20 outer $\times $ 500 inner). Removal is $4\times $ more damaging even when the perturbation adversary is given equal training budget}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Additional Ablations}{8}{subsection.5.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{8}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Scaling trend.}{8}{section*.27}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{CACw: necessary but not sufficient.}{8}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Scaling trend.}{8}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{CACw: necessary but not sufficient.}{8}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Implications for deployment.}{8}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{8}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Discrete scope.}{8}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Theory.}{8}{section*.27}\protected@file@percent }
 \bibstyle{plainnat}
 \bibdata{references}
 \bibcite{altman1999constrained}{{1}{1999}{{Altman}}{{}}}
 \bibcite{balduzzi2019open}{{2}{2019}{{Balduzzi et~al.}}{{Balduzzi, Garnelo, Bachrach, Czarnecki, P{\'e}rolat, Jaderberg, and Graepel}}}
-\bibcite{brown2019superhuman}{{3}{2019}{{Brown and Sandholm}}{{}}}
-\bibcite{gleave2020adversarial}{{4}{2020}{{Gleave et~al.}}{{Gleave, Dennis, Wild, Kant, Levine, and Russell}}}
-\bibcite{heinrich2016deep}{{5}{2016}{{Heinrich and Silver}}{{}}}
-\@writefile{toc}{\contentsline {paragraph}{Implications for deployment.}{9}{section*.29}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{9}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Discrete scope.}{9}{section*.30}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Theory.}{9}{section*.31}\protected@file@percent }
+\bibcite{boutilier1999decision}{{3}{1999}{{Boutilier et~al.}}{{Boutilier, Dean, and Hanks}}}
+\bibcite{brown2019superhuman}{{4}{2019}{{Brown and Sandholm}}{{}}}
+\bibcite{brown2019deep}{{5}{2019}{{Brown et~al.}}{{Brown, Lerer, Gross, and Sandholm}}}
+\bibcite{gleave2020adversarial}{{6}{2020}{{Gleave et~al.}}{{Gleave, Dennis, Wild, Kant, Levine, and Russell}}}
+\bibcite{heinrich2016deep}{{7}{2016}{{Heinrich and Silver}}{{}}}
+\bibcite{hu2022sparse}{{8}{2022}{{Hu and Zhang}}{{}}}
+\bibcite{huang2017adversarial}{{9}{2017}{{Huang et~al.}}{{Huang, Papernot, Goodfellow, Duan, and Abbeel}}}
+\bibcite{huang2022closer}{{10}{2022}{{Huang and Onta{\~n}{\'o}n}}{{}}}
+\bibcite{iyengar2005robust}{{11}{2005}{{Iyengar}}{{}}}
+\bibcite{lanctot2017unified}{{12}{2017}{{Lanctot et~al.}}{{Lanctot, Zambaldi, Gruslys, Lazaridou, Tuyls, P{\'e}rolat, Silver, and Graepel}}}
+\bibcite{lanctot2019openspiel}{{13}{2019}{{Lanctot et~al.}}{{Lanctot, Lockhart, Lespiau, Zambaldi, et~al.}}}
+\bibcite{lin2020marlrobust}{{14}{2020}{{Lin et~al.}}{{Lin, Dzeparoska, Zhang, Leon-Garcia, and Papernot}}}
 \@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{9}{section.8}\protected@file@percent }
-\bibcite{huang2017adversarial}{{6}{2017}{{Huang et~al.}}{{Huang, Papernot, Goodfellow, Duan, and Abbeel}}}
-\bibcite{huang2022closer}{{7}{2022}{{Huang and Onta{\~n}{\'o}n}}{{}}}
-\bibcite{lanctot2017unified}{{8}{2017}{{Lanctot et~al.}}{{Lanctot, Zambaldi, Gruslys, Lazaridou, Tuyls, P{\'e}rolat, Silver, and Graepel}}}
-\bibcite{lanctot2019openspiel}{{9}{2019}{{Lanctot et~al.}}{{Lanctot, Lockhart, Lespiau, Zambaldi, et~al.}}}
-\bibcite{pinto2017robust}{{10}{2017}{{Pinto et~al.}}{{Pinto, Davidson, Sukthankar, and Gupta}}}
-\bibcite{silver2018general}{{11}{2018}{{Silver et~al.}}{{Silver, Hubert, Schrittwieser, et~al.}}}
-\bibcite{sun2022who}{{12}{2022}{{Sun et~al.}}{{Sun, Zheng, Liang, and Huang}}}
-\bibcite{tessler2019action}{{13}{2019}{{Tessler et~al.}}{{Tessler, Efroni, and Mannor}}}
-\bibcite{zhang2021robust}{{14}{2021}{{Zhang et~al.}}{{Zhang, Chen, Boning, and Hsieh}}}
-\bibcite{zhang2020adaptive}{{15}{2020}{{Zhang et~al.}}{{Zhang, Ma, Singla, and Zhu}}}
+\bibcite{nilim2005robust}{{15}{2005}{{Nilim and El~Ghaoui}}{{}}}
+\bibcite{niu2026cama}{{16}{2026}{{Niu et~al.}}{{Niu, Fan, Jing, Luo, and Lu}}}
+\bibcite{pinto2017robust}{{17}{2017}{{Pinto et~al.}}{{Pinto, Davidson, Sukthankar, and Gupta}}}
+\bibcite{silver2018general}{{18}{2018}{{Silver et~al.}}{{Silver, Hubert, Schrittwieser, et~al.}}}
+\bibcite{sun2022who}{{19}{2022}{{Sun et~al.}}{{Sun, Zheng, Liang, and Huang}}}
+\bibcite{tessler2019action}{{20}{2019}{{Tessler et~al.}}{{Tessler, Efroni, and Mannor}}}
+\bibcite{zhang2021robust}{{21}{2021}{{Zhang et~al.}}{{Zhang, Chen, Boning, and Hsieh}}}
+\bibcite{zhang2020adaptive}{{22}{2020}{{Zhang et~al.}}{{Zhang, Ma, Singla, and Zhu}}}
+\bibcite{zinkevich2007regret}{{23}{2007}{{Zinkevich et~al.}}{{Zinkevich, Johanson, Bowling, and Piccione}}}
 \@writefile{toc}{\contentsline {section}{\numberline {A}Tabular PPO Details}{10}{appendix.A}\protected@file@percent }
 \newlabel{app:ppo}{{A}{10}{Tabular PPO Details}{appendix.A}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {B}Experimental Protocols}{10}{appendix.B}\protected@file@percent }
 \newlabel{app:protocols}{{B}{10}{Experimental Protocols}{appendix.B}{}}
-\@writefile{toc}{\contentsline {paragraph}{Self-play protocol.}{10}{section*.33}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Transfer experiment.}{10}{section*.34}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Budget enforcement.}{10}{section*.35}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Q-Learning hyperparameters.}}{11}{table.12}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces DQN hyperparameters (Leduc).}}{11}{table.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Self-play protocol.}{10}{section*.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Transfer experiment.}{10}{section*.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Budget enforcement.}{10}{section*.32}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Q-Learning hyperparameters.}}{11}{table.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces DQN hyperparameters for Leduc-scale experiments.}}{11}{table.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {C}Hyperparameters}{11}{appendix.C}\protected@file@percent }
 \newlabel{app:hyperparams}{{C}{11}{Hyperparameters}{appendix.C}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {D}Normalisation Details}{11}{appendix.D}\protected@file@percent }
 \newlabel{app:normalisation}{{D}{11}{Normalisation Details}{appendix.D}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {E}Learning Curves Under Attack}{11}{appendix.E}\protected@file@percent }
-\newlabel{app:curves}{{E}{11}{Learning Curves Under Attack}{appendix.E}{}}
-\@writefile{toc}{\contentsline {paragraph}{Kuhn + QL (seed 42).}{11}{section*.36}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Leduc + QL (seed 42).}{11}{section*.37}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Leduc + NFSP (seed 42).}{11}{section*.38}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Leduc-5 + NFSP (5 seeds).}{11}{section*.39}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces PPO hyperparameters.}}{12}{table.14}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces Adversary hyperparameters (tabular / neural).}}{12}{table.15}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {16}{\ignorespaces Normalisation bounds (max single-hand loss/gain).}}{12}{table.16}\protected@file@percent }
-\gdef \@abspage@last{12}
+\@writefile{toc}{\contentsline {section}{\numberline {E}Additional Ablations}{11}{appendix.E}\protected@file@percent }
+\newlabel{app:ablations}{{E}{11}{Additional Ablations}{appendix.E}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {F}Learning Curves Under Attack}{11}{appendix.F}\protected@file@percent }
+\newlabel{app:curves}{{F}{11}{Learning Curves Under Attack}{appendix.F}{}}
+\@writefile{toc}{\contentsline {paragraph}{Kuhn + QL (seed 42).}{11}{section*.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Leduc + QL (seed 42).}{11}{section*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Leduc + NFSP (seed 42).}{11}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Leduc-5 + NFSP (5 seeds).}{11}{section*.36}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Neural NFSP hyperparameters (Leduc-5).}}{12}{table.8}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces PPO hyperparameters.}}{12}{table.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Adversary hyperparameters (tabular / neural).}}{12}{table.10}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Normalisation bounds (max single-hand loss/gain).}}{12}{table.11}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs).}}{12}{table.12}\protected@file@percent }
+\newlabel{tab:budget}{{12}{12}{Budget sweep: victim reward (raw) under adversarial and random masking (Kuhn, 10 seeds, 95\% CIs)}{table.12}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Secondary ablations in Kuhn Q-learning.}}{13}{table.13}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Learned Kuhn mask at full budget.}}{13}{table.14}\protected@file@percent }
+\gdef \@abspage@last{13}
