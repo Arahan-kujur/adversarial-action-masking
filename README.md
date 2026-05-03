@@ -34,6 +34,42 @@ We implement a bi-level optimisation:
 - **Inner loop**: RL agent trains via self-play under the mask
 - **Outer loop**: adversary learns which actions to remove to minimise agent reward
 
+## Experiments
+
+| Script | What it does |
+|---|---|
+| `experiments/evaluate_attack.py` | Compare all masking strategies side-by-side |
+| `experiments/train_selfplay.py` | Train agent, evaluate under fixed mask |
+| `experiments/train_adversary.py` | Bi-level adversarial training |
+| `experiments/minimal_attack.py` | **Budget sweep**: how few states must the adversary target? |
+| `experiments/vulnerability_comparison.py` | Self-play vs fixed-opponent vulnerability |
+| `experiments/targeting_analysis.py` | Which states does the adversary target and why? |
+
+## Key Results (Kuhn Poker)
+
+**Adversarial >> Random** (same number of actions removed):
+```
+No mask:            -0.12
+Random (p=0.3):      0.00
+Random (p=0.7):     -0.50
+Fixed (remove BET): -0.94
+Adversarial:        -1.05
+```
+
+**Self-play amplifies the attack**:
+```
+Self-play:       -0.98
+Fixed opponent:  -0.84
+```
+
+**Budget sweep** -- adversary needs only 3/6 states to cause significant damage:
+```
+Budget 0 (none):  -0.05
+Budget 1:         -0.02
+Budget 3:         -0.25  (adversarial >> random at -0.15)
+Budget 6 (all):   -0.92
+```
+
 ## Masking Strategies
 
 | Strategy | Description |
@@ -41,7 +77,8 @@ We implement a bi-level optimisation:
 | No mask | Baseline -- full action space |
 | Random | Remove actions with probability p per step |
 | Fixed | Always remove a specific action (e.g., BET) |
-| Adversarial | Learned policy that chooses which action to remove per state |
+| Adversarial | Learned policy choosing which action to remove per state |
+| Adversarial (budget) | Same, but limited to masking at k states |
 
 ## Project Structure
 

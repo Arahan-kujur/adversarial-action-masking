@@ -44,14 +44,21 @@ class AdversarialMask:
     The adversary observes the agent's info state and chooses which
     action to remove. Trained to minimise the agent's reward.
 
-    For Kuhn with 2 actions, the adversary's decision at each P0 info
-    state is binary: remove action 0 or action 1.
+    Parameters
+    ----------
+    target_player : int
+    num_actions : int
+    lr : float
+    budget : int or None
+        Max number of info states the adversary can mask at.
+        If None, no budget limit (can mask at every state).
     """
 
-    def __init__(self, target_player=0, num_actions=2, lr=0.01):
+    def __init__(self, target_player=0, num_actions=2, lr=0.01, budget=None):
         self.target_player = target_player
         self.num_actions = num_actions
         self.lr = lr
+        self.budget = budget
         self.theta = {}
 
     def _get_removal_prob(self, info_state):
@@ -62,10 +69,27 @@ class AdversarialMask:
         exp_l = np.exp(logits - logits.max())
         return exp_l / exp_l.sum()
 
+    def _active_states(self):
+        """Return the top-budget states by adversary confidence."""
+        if self.budget is None or not self.theta:
+            return None
+        confidences = {}
+        for info_state, th in self.theta.items():
+            probs = np.exp(th - th.max())
+            probs /= probs.sum()
+            confidences[info_state] = max(probs) - 1.0 / self.num_actions
+        ranked = sorted(confidences, key=confidences.get, reverse=True)
+        return set(ranked[:self.budget])
+
     def mask_fn(self, info_state, legal_actions, player):
-        """Mask function for MaskedKuhnPoker."""
+        """Mask function compatible with MaskedEnv.set_mask()."""
         if player != self.target_player or len(legal_actions) <= 1:
             return legal_actions
+
+        if self.budget is not None:
+            active = self._active_states()
+            if active is not None and info_state not in active:
+                return legal_actions
 
         probs = self._get_removal_prob(info_state)
         remove_idx = np.argmax(probs)
