@@ -15,10 +15,13 @@ OUT_DIR = Path(__file__).resolve().parents[1] / "paper" / "latex" / "figures"
 
 
 def save_scaling_trend() -> None:
-    games = ["Leduc", "Leduc-5", "Leduc-10", "Leduc-20"]
-    states = np.array([50, 389, 1496, 5531], dtype=float)
-    ratios = np.array([2.2, 4.6, 4.7, 4.8], dtype=float)
-    cis = np.array([0.47, 0.23, 0.23, 0.15], dtype=float)
+    games = ["Leduc", "Leduc-5", "Leduc-10", "Leduc-20", "Leduc-30", "Leduc-50"]
+    # Reachable P0 info-state counts under uniform random play (game-tree
+    # size proxy; monotone in rank count).
+    states = np.array([144, 390, 1530, 5900, 12248, 26293], dtype=float)
+    # Adversarial / random damage ratios.
+    ratios = np.array([2.2, 4.6, 4.7, 4.8, 8.4, 7.6], dtype=float)
+    cis = np.array([0.47, 0.23, 0.23, 0.15, 0.45, 0.40], dtype=float)
 
     x = np.log10(states)
     slope, intercept = np.polyfit(x, ratios, 1)
@@ -26,7 +29,7 @@ def save_scaling_trend() -> None:
 
     fig, ax = plt.subplots(figsize=(5.2, 3.2))
     ax.errorbar(states, ratios, yerr=cis, fmt="o", capsize=4, label="Observed")
-    ax.plot(10**xs, slope * xs + intercept, "--", label=f"log-linear fit")
+    ax.plot(10**xs, slope * xs + intercept, "--", label="log-linear fit")
     for s, r, name in zip(states, ratios, games):
         ax.annotate(name, (s, r), textcoords="offset points", xytext=(5, 5), fontsize=8)
     ax.set_xscale("log")

@@ -2,29 +2,57 @@
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+
+# Virtual environments
+.env
+.venv/
+venv/
+env/
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Environment
-.env
-.venv/
-
-# Results (regenerated)
-results/*.csv
-results/*.npy
-
-# Local archives/uploads
-*.zip
-
-# LaTeX auxiliary files
-*.aux
-*.log
-*.out
-*.blg
-
-# IDE
+# IDE / editors
 .vscode/
 .idea/
+.cursor/
 *.swp
+*.swo
+
+# Local archives and submission artifacts
+*.zip
+*.tar
+*.tar.gz
+
+# Logs (local experiment dumps)
+*.log
+*_log.txt
+leduc*_log.txt
+
+# Paper sources and compiled artifacts
+# The paper lives in Overleaf / elsewhere; this repo is code-only.
+paper/
+
+# Anonymized supplementary mirror (regenerable from the main code).
+supplementary_material/
+
+# Experiment outputs (regenerable by re-running the scripts).
+results/
+
+# LaTeX intermediates (just in case any paper files leak in)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb

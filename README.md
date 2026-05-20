@@ -1,168 +1,171 @@
-# When Actions Disappear
+# Contingent Decision Capacity
 
-This repository contains the experiments and paper source for **When Actions Disappear: Adversarial Action Removal in Self-Play Reinforcement Learning**.
+Code for the paper **Contingent Decision Capacity: Structural Robustness of Self-Play Agents to Action Availability Constraints** (submitted to EUMAS). An earlier version was titled *When Actions Disappear: Adversarial Action Removal in Self-Play Reinforcement Learning*.
 
-The paper studies a structural adversarial attack: instead of perturbing observations or replacing chosen actions, an attacker removes legal actions from the victim's available action set before action selection. The main finding is that targeted action removal is substantially more damaging than random masking or learned action perturbation, and the effect persists across algorithms, domains, and game sizes.
+The paper studies a structural perturbation of multi-agent systems: at decision time, an agent's available actions are reduced (by faults, sandboxing, rate-limiting, regulatory restrictions, or strategic constraints). It introduces **contingent action capacity** (`CAC_w` and its value-weighted refinement `CAC_v`) as a way to measure how much strategic flexibility an agent retains under such constraints, and shows that self-play strategies concentrate value at a small number of pivotal information states, which makes them disproportionately fragile to targeted availability constraints.
 
-## Highlights
+## Headline results
 
-- New attack surface: adversarial removal of legal actions.
-- Bi-level adversary: victim trains under a mask; adversary learns which actions to remove.
-- Mechanism: reach-weighted and value-weighted contingent action capacity (`CAC_w`, `CAC_v`).
-- Scale: poker variants from Kuhn (6 victim information states) to Leduc-20 (5,531 victim information states).
-- Algorithms: Q-learning, PPO, NFSP, neural NFSP, and DQN.
-- Domains: poker, competitive gridworld, and resource collection.
-- NeurIPS-style paper source and reproducibility notes included.
+- **Phenomenon**: across six Leduc-N variants (144 to 26,293 reachable P0 information states), a learned worst-case availability constraint causes 2.2× to **8.4×** more damage than random unavailability of equal support, with log-linear scaling regression `R² = 0.70`.
+- **Mechanism**: `CAC_v` lower-bounds worst-case damage independent of the constraint policy's parametric class (Prop. 4); empirically correlates with reward at `r = 0.81`.
+- **Defenses**:
+  - Uniform random dropout helps modestly (Leduc `-1.82` vs `-2.45` undefended).
+  - Static random-mask ensembles fail.
+  - `CAC_v`-guided redundancy training Pareto-improves robustness (Leduc `-2.26 → -1.43`, **36% damage reduction**).
+  - A constrained-MDP-style **mask-aware** agent (observes its own availability vector) reaches `-0.18` (**92% damage reduction**) — clean dichotomy: the attack devastates unaware agents but is largely defensible once awareness is restored.
+- **Cooperative MAS**: in a Hanabi-V2 variant (3 colours × 5 ranks, hand size 3), structural removal of communication actions cleanly degrades convention metrics (action entropy 2.16 → 1.57 bits).
+- **Cross-domain**: same phenomenon holds in a competitive gridworld and a resource-collection game.
+- **Best-response oracle**: in Kuhn, exploitability against a true best-responder rises from `0.43` to `1.20` per hand after the attack (`2.8×` increase) — consistent with head-to-head reward, confirming intrinsic policy degradation rather than opponent co-adaptation.
 
-## Key Results
+A full chronological narrative of the project (NeurIPS submission, desk reject, EUMAS pivot, ablations, defense work) is in [Report.md](Report.md).
 
-### Scaling With Game Size
-
-| Game | Victim Info States | Victim | Adversarial / Random Damage |
-|---|---:|---|---:|
-| Leduc | ~50 | DQN | 2.2x |
-| Leduc-5 | 389 | DQN | 4.6x |
-| Leduc-10 | 1,496 | DQN | 4.7x |
-| Leduc-20 | 5,531 | DQN | 4.8x |
-
-The adversary remains effective as game complexity grows. The largest run, Leduc-20, reaches `-3.00 +/- 0.15` victim reward versus `-0.63 +/- 0.08` for random masking.
-
-### Reviewer-Response Controls
-
-| Control | Result |
-|---|---|
-| Public-information adversary | Still beats random in Leduc: `-1.71` vs `-0.98` |
-| Matched-L0 random baseline | Same support size, adversary still 2.24x worse |
-| CACv-greedy oracle | Stronger than random and short-trained learned adversary |
-| Separate-network DQN | Collapse persists without shared parameters |
-| Evaluation-only masking | Immediate damage: `-0.58` after normal training |
-| Mask-aware training from scratch | Still collapses: `-2.71` |
-| Action-dropout defense | Helps modestly: `-1.82` vs standard `-2.45` |
-| Random mask-ensemble defense | Does not help: `-2.64` |
-
-## Repository Layout
+## Repository layout
 
 ```text
 adversary/
-  masking_policy.py        Random, fixed, and learned action-removal policies
-  mask_utils.py            Evaluation and mask statistics
+  masking_policy.py        Random, fixed, and learned action-availability policies
+  mask_utils.py            Evaluation helpers and mask diagnostics
 
 core/
   agents/
-    q_learning.py          Tabular Q-learning
+    q_learning.py          Tabular Q-learning (with optional CACv-regularization)
     ppo.py                 Tabular PPO
     nfsp.py                Tabular NFSP
     neural_nfsp.py         Neural NFSP
-    dqn.py                 DQN + encoders for Kuhn/Leduc/Leduc-N
+    dqn.py                 DQN + encoders for Kuhn / Leduc / Leduc-N (any N)
   envs/
     kuhn_poker.py          Kuhn Poker
     leduc_poker.py         Leduc Poker
     leduc_n.py             Leduc-N scale variants
-    gridworld.py           Competitive gridworld
-    resource_collection.py Resource collection game
+    gridworld.py           Competitive 5x5 gridworld (prey/predator)
+    resource_collection.py 4x4 resource competition
+    hanabi_small.py        Hanabi-Small + Hanabi-V2 cooperative variants
   training/
     selfplay.py            Shared self-play loop
 
 experiments/
-  leduc20_scale.py         Largest DQN scaling run
-  leduc10_scale.py         Leduc-10 scaling run
-  leduc5_scale.py          Leduc-5 scaling run
-  neural_nfsp_leduc5.py    Neural NFSP under attack
-  reviewer_strengthening.py Public-info, CACv oracle, L0, separate DQN, dropout
-  matched_l0_control.py    Strict matched-L0 random control
-  mask_timing_controls.py  Evaluation-only and mask-aware victim controls
-  mask_ensemble_defense.py Mask-ensemble defense baseline
-  generate_neurips_figures.py Figure generation script
+  Scaling
+    leduc5_scale.py, leduc10_scale.py, leduc20_scale.py
+    leduc30_scale.py, leduc50_scale.py
+    state_counts_uniform.py    Reachable state counts under uniform random play
+    scaling_regression.py      Log-linear regression of damage ratio vs game size
 
-paper/
-  paper.md                 Markdown paper summary
-  latex/
-    main.tex               NeurIPS-style LaTeX source
-    main.pdf               Compiled PDF
-    figures/               Generated figures
-    references.bib         Bibliography
+  Defenses
+    mask_ensemble_defense.py
+    cacv_regularized_defense.py
+    cacv_intervention.py              Compressed vs redundant victim
+    robustness_frontier.py            Sweep regularization strength
+    plot_robustness_frontier.py
+    adversarial_cotraining_defense.py
+    mask_aware_robust_defense.py      Constrained-MDP-style baseline
+
+  Mechanism
+    cacv_metric.py, cacw_correlation.py
+    targeting_analysis.py, attack_efficiency.py
+    rarl_comparison.py, learned_perturbation.py
+    matched_l0_control.py, budget_fairness.py, budget_sweep_detailed.py
+    reviewer_strengthening.py         Public-info, CACv oracle, separate-DQN, dropout
+    strategic_concentration_profiles.py
+    aggregate_strategic_concentration.py
+    final_strategic_compression_analysis.py
+    summarize_crt_frontier.py
+
+  Cooperative MAS
+    hanabi_small_masking.py
+    hanabi_v2_masking.py
+
+  Reviewer-response controls
+    kuhn_exploitability.py            Best-response oracle exploitability
+
+  Other
+    cross_comparison.py, cross_domain.py, cross_domain2.py
+    cross_transfer.py, attack_generalization.py
+    dqn_leduc_full.py, neural_adversary.py
+    nfsp_victim.py, nfsp_leduc.py, nfsp_leduc5.py, neural_nfsp_leduc5.py
+    separate_networks.py, vulnerability_comparison.py
+    learning_curves.py, gap_vs_size.py, ablation_heuristic.py
+    minimal_attack.py, evaluate_attack.py
+    train_selfplay.py, train_adversary.py
+    generate_neurips_figures.py, generate_table.py
 ```
+
+The compiled paper, supplementary submission mirror, and generated result CSVs/figures are all excluded by `.gitignore`; this repository is code-only.
 
 ## Installation
 
-Python 3.10+ is recommended.
+Python 3.10+ recommended.
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate  # Windows PowerShell
+.venv\Scripts\activate          # Windows PowerShell
+# or
+source .venv/bin/activate       # Linux/macOS
+
 pip install -r requirements.txt
 ```
 
-Dependencies:
+Runtime dependencies are `numpy`, `torch`, and `matplotlib`.
 
-- `numpy`
-- `torch`
-- `matplotlib`
+## Quick start
 
-## Quick Start
-
-Run the smallest attack comparison:
+Smallest end-to-end example (Kuhn poker, learned constraint policy):
 
 ```bash
-python experiments/evaluate_attack.py
+python experiments/minimal_attack.py
 ```
 
-Run the main scaling experiments:
+Headline scaling table:
 
 ```bash
 python experiments/leduc5_scale.py
 python experiments/leduc10_scale.py
 python experiments/leduc20_scale.py
+python experiments/leduc30_scale.py
+python experiments/leduc50_scale.py
+python experiments/state_counts_uniform.py
+python experiments/scaling_regression.py
 ```
 
-Run the reviewer-response controls:
+Defenses (CACv-guided redundancy + mask-aware C-MDP):
 
 ```bash
-python experiments/reviewer_strengthening.py
-python experiments/matched_l0_control.py
-python experiments/mask_timing_controls.py
-python experiments/mask_ensemble_defense.py
+python experiments/cacv_regularized_defense.py
+python experiments/robustness_frontier.py
+python experiments/plot_robustness_frontier.py
+python experiments/mask_aware_robust_defense.py
 ```
 
-Regenerate figures:
+Best-response oracle exploitability (Kuhn):
 
 ```bash
-python experiments/generate_neurips_figures.py
+python experiments/kuhn_exploitability.py
 ```
 
-Compile the paper:
+Cooperative benchmark:
 
 ```bash
-cd paper/latex
-pdflatex -interaction=nonstopmode main.tex
-bibtex main
-pdflatex -interaction=nonstopmode main.tex
-pdflatex -interaction=nonstopmode main.tex
+python experiments/hanabi_v2_masking.py
 ```
 
-## Paper
-
-The NeurIPS-style source is in [`paper/latex/main.tex`](paper/latex/main.tex), with the compiled PDF at [`paper/latex/main.pdf`](paper/latex/main.pdf).
-
-The main body is kept within the NeurIPS 9-page target; supporting ablations, hyperparameters, normalization bounds, and learning curves are in the appendix.
+All scripts set their own random seeds internally and write any artifacts under `results/` (ignored by git).
 
 ## Reproducibility
 
-All reported experiments are standalone Python scripts under `experiments/`. Seeds are fixed inside the scripts. The largest experiment (`experiments/leduc20_scale.py`) uses five seeds, 30k victim pre-training episodes, and 25 adversary outer iterations with 500 victim-training episodes per adversary update.
+Every reported result comes from a standalone script under `experiments/`. The largest run (`leduc50_scale.py`) uses five seeds, 30k pre-training episodes, and 25 outer × 500 inner constraint-training episodes; on a desktop CPU it finishes in ~8 minutes per seed (~40 minutes total).
+
+For the cooperative Hanabi-V2 result, three seeds and ~8k tabular self-play episodes per seed are sufficient for the structural removal effect to show up in convention metrics; the learned worst-case constraint requires stronger victims (neural function approximation) and is noted as future work in the paper.
 
 ## Citation
 
-If you use this code, cite the repository or paper draft:
-
 ```bibtex
-@misc{kujur2026adversarialactionremoval,
-  title={When Actions Disappear: Adversarial Action Removal in Self-Play Reinforcement Learning},
-  author={Kujur, Arahan},
-  year={2026},
-  note={Preprint}
+@misc{kujur2026contingentcapacity,
+  title  = {Contingent Decision Capacity: Structural Robustness of Self-Play Agents to Action Availability Constraints},
+  author = {Kujur, Arahan},
+  year   = {2026},
+  note   = {Preprint; submitted to EUMAS.}
 }
 ```
 
 ## License
 
-No license file is currently included. Add a license before public release if you plan to distribute or accept contributions.
+No license file is included yet. Add one (MIT, Apache-2.0, etc.) before public distribution if you want to clarify reuse terms.

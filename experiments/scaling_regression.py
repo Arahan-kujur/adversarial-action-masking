@@ -6,12 +6,17 @@ Fits log-linear regression and reports R^2.
 import numpy as np
 
 # Data from experiments (states, adv_reward, random_reward, none_reward)
+# States = reachable P0 info-state count under uniform random play (game-tree
+# size proxy). This is monotone in rank count, unlike trained-policy observed
+# counts which depend on policy concentration.
 data = [
-    ("Kuhn",    6,     -0.95,  -0.22,  +0.01),
-    ("Leduc",   50,    -2.57,  -1.17,  -0.10),
-    ("Leduc-5", 389,   -2.74,  -0.60,  -0.15),
-    ("Leduc-10", 1496, -3.19,  -0.68,  -0.18),
-    ("Leduc-20", 5531, -3.00,  -0.63,  -0.09),
+    ("Kuhn",    6,      -0.95,  -0.22,  +0.01),
+    ("Leduc",   144,    -2.57,  -1.17,  -0.10),
+    ("Leduc-5", 390,    -2.74,  -0.60,  -0.15),
+    ("Leduc-10", 1530,  -3.19,  -0.68,  -0.18),
+    ("Leduc-20", 5900,  -3.00,  -0.63,  -0.09),
+    ("Leduc-30", 12248, -3.218, -0.454, -0.081),
+    ("Leduc-50", 26293, -2.965, -0.475, -0.098),
 ]
 
 print("Scaling Analysis: Adversary Efficiency vs Game Size", flush=True)

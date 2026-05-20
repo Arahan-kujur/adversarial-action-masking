@@ -113,6 +113,8 @@ def get_encoder(game: str):
         return _leduc_n_encoder(10)
     if game == "leduc20":
         return _leduc_n_encoder(20)
+    if game.startswith("leduc") and game[5:].isdigit():
+        return _leduc_n_encoder(int(game[5:]))
     raise ValueError(f"Unknown game: {game}")
 
 
